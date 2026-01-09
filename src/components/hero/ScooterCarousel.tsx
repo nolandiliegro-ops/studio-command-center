@@ -79,7 +79,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-center h-full">
+    <div className="relative flex flex-col items-center justify-center h-full -translate-x-12 lg:-translate-x-20">
       {/* Arc Background */}
       <div className="absolute inset-0 arc-gradient pointer-events-none" />
 
