@@ -30,7 +30,7 @@ interface CategoryBentoGridProps {
 // Mapping slug -> Lucide icon
 const iconMap: Record<string, LucideIcon> = {
   pneus: Disc,
-  "chambres-a-air": CircleDot,
+  "chambres-air": CircleDot,
   freinage: Octagon,
   chargeurs: Plug,
   batteries: Battery,
