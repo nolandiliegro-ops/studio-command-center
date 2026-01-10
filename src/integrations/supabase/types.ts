@@ -14,7 +14,199 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      brands: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          icon: string | null
+          id: string
+          name: string
+          product_count: number | null
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name: string
+          product_count?: number | null
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name?: string
+          product_count?: number | null
+          slug?: string
+        }
+        Relationships: []
+      }
+      part_compatibility: {
+        Row: {
+          created_at: string
+          id: string
+          part_id: string
+          scooter_model_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          part_id: string
+          scooter_model_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          part_id?: string
+          scooter_model_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "part_compatibility_part_id_fkey"
+            columns: ["part_id"]
+            isOneToOne: false
+            referencedRelation: "parts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "part_compatibility_scooter_model_id_fkey"
+            columns: ["scooter_model_id"]
+            isOneToOne: false
+            referencedRelation: "scooter_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parts: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          description: string | null
+          difficulty_level: number | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number | null
+          stock_quantity: number | null
+          technical_metadata: Json | null
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty_level?: number | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price?: number | null
+          stock_quantity?: number | null
+          technical_metadata?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty_level?: number | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number | null
+          stock_quantity?: number | null
+          technical_metadata?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scooter_models: {
+        Row: {
+          brand_id: string
+          compatible_parts_count: number | null
+          created_at: string
+          id: string
+          image_url: string | null
+          max_speed_kmh: number | null
+          name: string
+          power_watts: number | null
+          range_km: number | null
+          slug: string
+          tire_size: string | null
+          voltage: number | null
+        }
+        Insert: {
+          brand_id: string
+          compatible_parts_count?: number | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          max_speed_kmh?: number | null
+          name: string
+          power_watts?: number | null
+          range_km?: number | null
+          slug: string
+          tire_size?: string | null
+          voltage?: number | null
+        }
+        Update: {
+          brand_id?: string
+          compatible_parts_count?: number | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          max_speed_kmh?: number | null
+          name?: string
+          power_watts?: number | null
+          range_km?: number | null
+          slug?: string
+          tire_size?: string | null
+          voltage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scooter_models_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
