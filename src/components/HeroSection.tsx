@@ -1,39 +1,62 @@
 import { useState, useMemo } from "react";
 import HeroBranding from "./hero/HeroBranding";
 import ScooterCarousel from "./hero/ScooterCarousel";
+import ScooterCarouselSkeleton from "./hero/ScooterCarouselSkeleton";
 import CommandPanel from "./hero/CommandPanel";
-import { brands, scooterModels } from "@/data/scooterData";
+import { useBrands, useScooterModels } from "@/hooks/useScooterData";
 
 const HeroSection = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Intelligent filtering logic
+  // Fetch data from database
+  const { data: brands = [], isLoading: brandsLoading } = useBrands();
+  const { data: scooterModels = [], isLoading: modelsLoading } = useScooterModels(selectedBrand);
+
+  const isLoading = brandsLoading || modelsLoading;
+
+  // Transform database models to the format expected by carousel
+  const transformedModels = useMemo(() => {
+    return scooterModels.map((model) => ({
+      id: model.slug,
+      name: model.name,
+      brandId: model.brand?.slug || "",
+      brand: model.brand?.name || "",
+      image: model.image_url || "/placeholder.svg",
+      compatibleParts: model.compatible_parts_count || 0,
+      specs: {
+        power: `${model.power_watts || 0}W`,
+        range: `${model.range_km || 0}km`,
+        maxSpeed: `${model.max_speed_kmh || 0}km/h`,
+      },
+    }));
+  }, [scooterModels]);
+
+  // Transform brands for CommandPanel
+  const transformedBrands = useMemo(() => {
+    return brands.map((brand) => ({
+      id: brand.slug,
+      name: brand.name,
+      logo: "🛴",
+    }));
+  }, [brands]);
+
+  // Filter by search query (matches brand or model name)
   const filteredModels = useMemo(() => {
-    let result = scooterModels;
+    if (!searchQuery.trim()) return transformedModels;
 
-    // Filter by brand if selected
-    if (selectedBrand) {
-      result = result.filter((model) => model.brandId === selectedBrand);
-    }
-
-    // Filter by search query (matches brand or model name)
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim();
-      result = result.filter(
-        (model) =>
-          model.name.toLowerCase().includes(query) ||
-          model.brand.toLowerCase().includes(query)
-      );
-    }
-
-    return result;
-  }, [selectedBrand, searchQuery]);
+    const query = searchQuery.toLowerCase().trim();
+    return transformedModels.filter(
+      (model) =>
+        model.name.toLowerCase().includes(query) ||
+        model.brand.toLowerCase().includes(query)
+    );
+  }, [transformedModels, searchQuery]);
 
   // Reset active index when filters change
-  const handleBrandSelect = (brandId: string | null) => {
-    setSelectedBrand(brandId);
+  const handleBrandSelect = (brandSlug: string | null) => {
+    setSelectedBrand(brandSlug);
     setActiveIndex(0);
   };
 
@@ -53,17 +76,21 @@ const HeroSection = () => {
 
           {/* Center Column - Carousel */}
           <div className="order-1 lg:order-2 h-full flex items-center">
-            <ScooterCarousel
-              models={filteredModels}
-              activeIndex={activeIndex}
-              onSelect={setActiveIndex}
-            />
+            {isLoading ? (
+              <ScooterCarouselSkeleton />
+            ) : (
+              <ScooterCarousel
+                models={filteredModels}
+                activeIndex={activeIndex}
+                onSelect={setActiveIndex}
+              />
+            )}
           </div>
 
           {/* Right Column - Command Panel */}
           <div className="order-3">
             <CommandPanel
-              brands={brands}
+              brands={transformedBrands}
               selectedBrand={selectedBrand}
               onBrandSelect={handleBrandSelect}
               searchQuery={searchQuery}
