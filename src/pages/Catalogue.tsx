@@ -1,13 +1,25 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search } from "lucide-react";
+import { Search, Loader2, Sparkles } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import Header from "@/components/Header";
 import CategoryBentoGrid from "@/components/catalogue/CategoryBentoGrid";
 import PartCard from "@/components/parts/PartCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useCategories } from "@/hooks/useScooterData";
 import { useAllParts } from "@/hooks/useCatalogueData";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 // Skeleton grid for loading state
 const SkeletonGrid = () => (
@@ -50,9 +62,67 @@ const EmptyState = ({ onClear }: { onClear: () => void }) => (
 
 const Catalogue = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const { data: parts = [], isLoading: partsLoading } = useAllParts(activeCategory);
+
+  const handleGenerateAllImages = async () => {
+    setShowConfirmModal(false);
+    setIsGenerating(true);
+    
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const category of categories) {
+      const toastId = `generating-${category.id}`;
+      
+      toast.info(`Engineering Visuals: ${category.name} is being rendered...`, {
+        id: toastId,
+        duration: 60000,
+      });
+
+      try {
+        const { data, error } = await supabase.functions.invoke(
+          "generate-category-image",
+          { body: { categoryId: category.id, categorySlug: category.slug } }
+        );
+
+        if (error) throw error;
+
+        toast.success(`${category.name}: Visual generated!`, { id: toastId, duration: 3000 });
+        successCount++;
+        
+        queryClient.invalidateQueries({ queryKey: ["category-images"] });
+        
+      } catch (error: any) {
+        const message = error?.message?.includes("429") 
+          ? "Rate limit exceeded" 
+          : error?.message?.includes("402")
+          ? "Credits required"
+          : error?.message?.includes("504")
+          ? "Generation timeout"
+          : "Generation failed";
+          
+        toast.error(`${category.name}: ${message}`, { id: toastId, duration: 5000 });
+        errorCount++;
+      }
+
+      // Delay between requests to prevent rate limiting
+      if (categories.indexOf(category) < categories.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+
+    setIsGenerating(false);
+    
+    toast.success(
+      `Studio Complete: ${successCount}/${categories.length} images rendered`,
+      { duration: 5000 }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-greige">
@@ -132,6 +202,79 @@ const Catalogue = () => {
           </AnimatePresence>
         </section>
       </main>
+
+      {/* Admin Confirmation Modal */}
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="bg-white/90 backdrop-blur-xl border border-white/30">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl text-carbon">
+              GENERATE STUDIO VISUALS
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Cette action va générer {categories.length} images AI. 
+              Cela peut prendre plusieurs minutes.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-2 max-h-48 overflow-y-auto">
+            {categories.map((cat) => (
+              <div key={cat.id} className="flex items-center gap-2 text-sm">
+                <div className="w-2 h-2 rounded-full bg-mineral" />
+                <span className="font-montserrat">{cat.name}</span>
+                <span className="text-muted-foreground">({cat.slug})</span>
+              </div>
+            ))}
+          </div>
+          
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleGenerateAllImages}
+              className="bg-mineral text-white hover:bg-mineral-dark"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              Lancer la génération
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin Floating Button - Dev Only */}
+      {import.meta.env.DEV && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="fixed bottom-6 right-6 z-50"
+        >
+          <button
+            onClick={() => setShowConfirmModal(true)}
+            disabled={isGenerating || categoriesLoading}
+            className={cn(
+              "flex items-center gap-2 px-4 py-3 rounded-xl",
+              "bg-white/20 backdrop-blur-md border border-white/30",
+              "text-carbon font-montserrat font-semibold text-sm",
+              "hover:bg-white/30 hover:border-mineral/50",
+              "transition-all duration-300 shadow-lg hover:shadow-xl",
+              "disabled:opacity-50 disabled:cursor-not-allowed"
+            )}
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 text-mineral" />
+                <span>Generate Studio Visuals (AI)</span>
+              </>
+            )}
+          </button>
+        </motion.div>
+      )}
     </div>
   );
 };
