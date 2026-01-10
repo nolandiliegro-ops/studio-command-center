@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import PartCard from "./parts/PartCard";
@@ -14,12 +15,12 @@ const BentoDiscoverySection = ({
   activeModelSlug, 
   activeModelName 
 }: BentoDiscoverySectionProps) => {
+  const navigate = useNavigate();
   const { data: parts = [], isLoading } = useCompatibleParts(activeModelSlug, 4);
   const { data: totalCount = 0 } = useCompatiblePartsCount(activeModelSlug);
 
   const handleViewAll = () => {
-    // Future: Navigate to /catalogue with filter
-    console.log("Navigate to catalogue for:", activeModelSlug);
+    navigate("/catalogue");
   };
 
   if (!activeModelSlug) return null;

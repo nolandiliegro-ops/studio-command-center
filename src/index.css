@@ -136,6 +136,15 @@
     font-family: 'Inter', sans-serif;
   }
 
+  /* Hide scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Pulse glow animation for Scanner button */
   .pulse-glow {
     animation: pulseGlow 2s ease-in-out infinite;
