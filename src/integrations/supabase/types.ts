@@ -192,6 +192,30 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string | null
+          display_name: string | null
+          id: string
+          performance_points: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_name?: string | null
+          id: string
+          performance_points?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          performance_points?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       scooter_models: {
         Row: {
           brand_id: string
@@ -241,6 +265,47 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_garage: {
+        Row: {
+          added_at: string | null
+          current_km: number | null
+          id: string
+          is_owned: boolean | null
+          next_maintenance_km: number | null
+          nickname: string | null
+          scooter_model_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string | null
+          current_km?: number | null
+          id?: string
+          is_owned?: boolean | null
+          next_maintenance_km?: number | null
+          nickname?: string | null
+          scooter_model_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string | null
+          current_km?: number | null
+          id?: string
+          is_owned?: boolean | null
+          next_maintenance_km?: number | null
+          nickname?: string | null
+          scooter_model_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_garage_scooter_model_id_fkey"
+            columns: ["scooter_model_id"]
+            isOneToOne: false
+            referencedRelation: "scooter_models"
             referencedColumns: ["id"]
           },
         ]

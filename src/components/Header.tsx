@@ -1,9 +1,20 @@
-import { Search, ShoppingCart, Menu, Home } from "lucide-react";
+import { Search, ShoppingCart, Menu, Home, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const navLinks = [
     { label: "Accueil", href: "/" },
@@ -12,30 +23,43 @@ const Header = () => {
     { label: "Tutos", href: "/tutos" },
   ];
 
+  const handleGarageClick = () => {
+    if (user) {
+      navigate('/garage');
+    } else {
+      navigate('/login');
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-display text-xl">
               PT
             </div>
             <span className="hidden sm:block text-lg font-medium">
               pièces<span className="text-primary font-semibold">trottinettes</span>
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
-                href={link.href}
+                to={link.href}
                 className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all hover:after:w-full"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -52,12 +76,50 @@ const Header = () => {
               </span>
             </Button>
 
-            <Button 
-              className="hidden sm:flex rounded-full px-6 font-display text-lg tracking-wide gap-2 bg-garage text-garage-foreground hover:bg-garage/90"
-            >
-              <Home className="w-4 h-4" />
-              Mon Garage
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    className="hidden sm:flex rounded-full px-4 font-display text-lg tracking-wide gap-2 bg-garage text-garage-foreground hover:bg-garage/90"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-garage-foreground/20 flex items-center justify-center text-sm font-semibold">
+                      {profile?.display_name?.charAt(0).toUpperCase() || 'R'}
+                    </div>
+                    Mon Garage
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/garage" className="flex items-center gap-2 cursor-pointer">
+                      <Home className="w-4 h-4" />
+                      Mon Garage
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/garage" className="flex items-center gap-2 cursor-pointer">
+                      <User className="w-4 h-4" />
+                      {profile?.performance_points || 0} points
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 cursor-pointer text-garage"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Déconnexion
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                onClick={handleGarageClick}
+                className="hidden sm:flex rounded-full px-6 font-display text-lg tracking-wide gap-2 bg-garage text-garage-foreground hover:bg-garage/90"
+              >
+                <LogIn className="w-4 h-4" />
+                Mon Garage
+              </Button>
+            )}
 
             {/* Mobile Menu Button */}
             <Button 
@@ -76,18 +138,43 @@ const Header = () => {
           <nav className="lg:hidden py-4 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.href}
-                  href={link.href}
+                  to={link.href}
                   className="px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
-              <Button className="mt-2 rounded-full font-display text-lg tracking-wide gap-2 bg-garage text-garage-foreground hover:bg-garage/90">
-                <Home className="w-4 h-4" />
-                Mon Garage
-              </Button>
+              {user ? (
+                <>
+                  <Link 
+                    to="/garage"
+                    className="mt-2 flex items-center justify-center gap-2 rounded-full py-3 font-display text-lg tracking-wide bg-garage text-garage-foreground"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Home className="w-4 h-4" />
+                    Mon Garage
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => { handleSignOut(); setIsMenuOpen(false); }}
+                    className="text-garage"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Déconnexion
+                  </Button>
+                </>
+              ) : (
+                <Button 
+                  onClick={() => { handleGarageClick(); setIsMenuOpen(false); }}
+                  className="mt-2 rounded-full font-display text-lg tracking-wide gap-2 bg-garage text-garage-foreground hover:bg-garage/90"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Mon Garage
+                </Button>
+              )}
             </div>
           </nav>
         )}
