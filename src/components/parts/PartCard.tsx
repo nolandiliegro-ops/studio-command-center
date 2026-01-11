@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Gauge } from "lucide-react";
+import { forwardRef } from "react";
 import DifficultyIndicator from "./DifficultyIndicator";
 import { CompatiblePart } from "@/hooks/useScooterData";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,7 @@ const extractSpecs = (metadata: Record<string, unknown> | null): { torque?: stri
   return result;
 };
 
-const PartCard = ({ part, index, className }: PartCardProps) => {
+const PartCard = forwardRef<HTMLDivElement, PartCardProps>(({ part, index, className }, ref) => {
   const specs = extractSpecs(part.technical_metadata);
   
   // Use torque_nm from part directly if available, otherwise from metadata
@@ -52,6 +53,7 @@ const PartCard = ({ part, index, className }: PartCardProps) => {
 
   const cardContent = (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -170,6 +172,8 @@ const PartCard = ({ part, index, className }: PartCardProps) => {
   }
 
   return cardContent;
-};
+});
+
+PartCard.displayName = "PartCard";
 
 export default PartCard;

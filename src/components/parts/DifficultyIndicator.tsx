@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface DifficultyIndicatorProps {
@@ -14,15 +15,15 @@ const difficultyLabels: Record<number, string> = {
   5: "Expert",
 };
 
-const DifficultyIndicator = ({ 
+const DifficultyIndicator = forwardRef<HTMLDivElement, DifficultyIndicatorProps>(({ 
   level, 
   showLabel = false, 
   className 
-}: DifficultyIndicatorProps) => {
+}, ref) => {
   const safeLevel = Math.min(Math.max(level || 1, 1), 5);
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div ref={ref} className={cn("flex items-center gap-2", className)}>
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((dot) => (
           <div
@@ -43,6 +44,8 @@ const DifficultyIndicator = ({
       )}
     </div>
   );
-};
+});
+
+DifficultyIndicator.displayName = "DifficultyIndicator";
 
 export default DifficultyIndicator;
