@@ -22,14 +22,14 @@ const Index = () => {
       <main className="h-[calc(100vh-4rem)] lg:h-[calc(100vh-5rem)] overflow-hidden">
         <div className="container mx-auto px-4 lg:px-8 h-full">
           <motion.div 
-            className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full py-4"
+            className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full py-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            {/* Left Column - Hero Section (Carousel + Controls) */}
+            {/* Left Column - Hero Section (Carousel + Controls) - 70% */}
             <motion.div 
-              className="lg:col-span-8 h-full rounded-3xl overflow-hidden relative"
+              className="lg:col-span-7 h-full rounded-3xl overflow-hidden relative"
               style={{
                 background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(250,250,250,0.95) 100%)",
                 backdropFilter: "blur(10px)",
@@ -46,9 +46,9 @@ const Index = () => {
               <HeroSection onActiveModelChange={handleActiveModelChange} />
             </motion.div>
 
-            {/* Right Column - Bento Discovery Grid */}
+            {/* Right Column - Bento Discovery Grid - 30% */}
             <motion.div 
-              className="lg:col-span-4 h-full rounded-3xl overflow-hidden relative"
+              className="lg:col-span-5 h-full rounded-3xl overflow-hidden relative"
               style={{
                 background: "rgba(255,255,255,0.7)",
                 backdropFilter: "blur(10px)",
