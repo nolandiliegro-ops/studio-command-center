@@ -138,25 +138,7 @@ const GarageScooterCarousel = ({ scooters, onScooterChange, className }: GarageS
         </div>
 
         {/* Studio Spotlight Container */}
-        <div 
-          className="absolute inset-0"
-          style={{ backgroundColor: '#3A3A3A' }}
-        >
-          {/* Subtle Spotlight Effect */}
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse 60% 40% at 50% 35%, rgba(147,181,161,0.12) 0%, transparent 70%)"
-            }}
-          />
-          
-          {/* Top Light Gradient */}
-          <div 
-            className="absolute inset-x-0 top-0 h-1/3 pointer-events-none"
-            style={{
-              background: "linear-gradient(to bottom, rgba(255,255,255,0.5) 0%, transparent 100%)"
-            }}
-          />
+        <div className="absolute inset-0">
 
           {/* Scooter Image with Premium Shadow - 40% LARGER */}
           <AnimatePresence mode="wait">
@@ -178,11 +160,11 @@ const GarageScooterCarousel = ({ scooters, onScooterChange, className }: GarageS
             )}
           </AnimatePresence>
 
-          {/* Floor Reflection/Shadow */}
+          {/* Floor Reflection/Shadow - Subtle */}
           <div 
             className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-16 pointer-events-none"
             style={{
-              background: "radial-gradient(ellipse 100% 100% at center, rgba(0,0,0,0.1) 0%, transparent 70%)"
+              background: "radial-gradient(ellipse 100% 100% at center, rgba(0,0,0,0.05) 0%, transparent 70%)"
             }}
           />
         </div>
