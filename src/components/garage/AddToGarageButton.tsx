@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Heart, Check, Star, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import AddToGarageDialog from './AddToGarageDialog';
+import LuxurySuccessToast from './LuxurySuccessToast';
 import { cn } from "@/lib/utils";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useIsInGarage, useAddToGarage, useRemoveFromGarage, useToggleOwned } from "@/hooks/useGarage";
@@ -28,6 +30,8 @@ const AddToGarageButton = ({ scooterId, scooterName, className }: AddToGarageBut
   const removeFromGarage = useRemoveFromGarage();
   const toggleOwned = useToggleOwned();
   const [isOpen, setIsOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'collection' | 'stable'>('collection');
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -42,13 +46,26 @@ const AddToGarageButton = ({ scooterId, scooterName, className }: AddToGarageBut
   };
 
   const handleAddCollection = () => {
-    addToGarage.mutate({ scooterId, isOwned: false, scooterName });
+    setDialogMode('collection');
+    setDialogOpen(true);
     setIsOpen(false);
   };
 
   const handleAddStable = () => {
-    addToGarage.mutate({ scooterId, isOwned: true, scooterName });
+    setDialogMode('stable');
+    setDialogOpen(true);
     setIsOpen(false);
+  };
+
+  const handleDialogConfirm = (data: { nickname: string; currentKm: number }) => {
+    addToGarage.mutate({ 
+      scooterId, 
+      isOwned: dialogMode === 'stable', 
+      scooterName,
+      nickname: data.nickname,
+      currentKm: data.currentKm
+    });
+    setDialogOpen(false);
   };
 
   const handlePromoteToStable = () => {
@@ -89,6 +106,7 @@ const AddToGarageButton = ({ scooterId, scooterName, className }: AddToGarageBut
   const isLoading = addToGarage.isPending || removeFromGarage.isPending || toggleOwned.isPending;
 
   return (
+    <>
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <motion.button
@@ -202,6 +220,16 @@ const AddToGarageButton = ({ scooterId, scooterName, className }: AddToGarageBut
         </DropdownMenuContent>
       )}
     </DropdownMenu>
+
+      {/* Add to Garage Dialog */}
+      <AddToGarageDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        scooterName={scooterName}
+        onConfirm={handleDialogConfirm}
+        isLoading={addToGarage.isPending}
+      />
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import LuxurySuccessToast from "@/components/garage/LuxurySuccessToast";
 
 interface GarageItem {
   id: string;
@@ -88,11 +89,15 @@ export const useAddToGarage = () => {
     mutationFn: async ({ 
       scooterId, 
       isOwned, 
-      scooterName 
+      scooterName,
+      nickname,
+      currentKm
     }: { 
       scooterId: string; 
       isOwned: boolean; 
       scooterName: string;
+      nickname?: string;
+      currentKm?: number;
     }) => {
       if (!user) throw new Error("Not authenticated");
 
@@ -103,12 +108,14 @@ export const useAddToGarage = () => {
           user_id: user.id,
           scooter_model_id: scooterId,
           is_owned: isOwned,
+          nickname: nickname || null,
+          current_km: currentKm || null,
         });
 
       if (garageError) throw garageError;
 
-      // Update performance points (+5 Collection, +10 Stable)
-      const pointsToAdd = isOwned ? 10 : 5;
+      // Update performance points (+100 if nickname provided, otherwise +5/+10)
+      const pointsToAdd = nickname ? 100 : (isOwned ? 10 : 5);
       
       // Get current points and update
       const { data: profile } = await supabase
@@ -130,15 +137,13 @@ export const useAddToGarage = () => {
       queryClient.invalidateQueries({ queryKey: ["user-garage"] });
       await refreshProfile();
 
-      if (isOwned) {
-        toast.success("Véhicule ajouté à votre écurie personnelle !", {
-          description: `+${pointsToAdd} Performance Points`,
-        });
-      } else {
-        toast.success("Favori ajouté à votre collection", {
-          description: `+${pointsToAdd} Performance Points`,
-        });
-      }
+      // Show luxury success toast
+      toast.custom(
+        (t) => <LuxurySuccessToast scooterName={scooterName} points={pointsToAdd} />,
+        {
+          duration: 5000,
+        }
+      );
     },
     onError: (error) => {
       console.error("Error adding to garage:", error);
