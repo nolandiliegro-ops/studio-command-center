@@ -57,6 +57,7 @@ export const useGarageScooters = () => {
             youtube_video_id,
             compatible_parts_count,
             brand:brands(id, name, slug)
+          )
         `)
         .eq("user_id", user.id)
         .order("added_at", { ascending: false });
