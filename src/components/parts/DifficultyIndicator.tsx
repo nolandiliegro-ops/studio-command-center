@@ -15,11 +15,8 @@ const difficultyLabels: Record<number, string> = {
   5: "Expert",
 };
 
-const DifficultyIndicator = forwardRef<HTMLDivElement, DifficultyIndicatorProps>(({ 
-  level, 
-  showLabel = false, 
-  className 
-}, ref) => {
+const DifficultyIndicator = forwardRef<HTMLDivElement, DifficultyIndicatorProps>(
+  function DifficultyIndicatorInner({ level, showLabel = false, className }, ref) {
   const safeLevel = Math.min(Math.max(level || 1, 1), 5);
 
   return (
@@ -44,8 +41,7 @@ const DifficultyIndicator = forwardRef<HTMLDivElement, DifficultyIndicatorProps>
       )}
     </div>
   );
-});
-
-DifficultyIndicator.displayName = "DifficultyIndicator";
+  }
+);
 
 export default DifficultyIndicator;

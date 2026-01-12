@@ -44,7 +44,8 @@ const extractSpecs = (metadata: Record<string, unknown> | null): { torque?: stri
   return result;
 };
 
-const PartCard = forwardRef<HTMLDivElement, PartCardProps>(({ part, index, className }, ref) => {
+const PartCard = forwardRef<HTMLDivElement, PartCardProps>(
+  function PartCardInner({ part, index, className }, ref) {
   const specs = extractSpecs(part.technical_metadata);
   
   // Use torque_nm from part directly if available, otherwise from metadata
@@ -172,8 +173,7 @@ const PartCard = forwardRef<HTMLDivElement, PartCardProps>(({ part, index, class
   }
 
   return cardContent;
-});
-
-PartCard.displayName = "PartCard";
+  }
+);
 
 export default PartCard;
