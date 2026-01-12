@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { Loader2, Trophy, Package, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import GarageScooterCarousel from '@/components/garage/GarageScooterCarousel';
@@ -202,6 +203,9 @@ const Garage = () => {
             </motion.div>
           )}
         </div>
+
+        {/* Footer */}
+        <Footer />
       </main>
     </div>
   );
