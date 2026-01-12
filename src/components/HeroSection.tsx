@@ -92,11 +92,11 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
   };
 
   return (
-    <section className="py-8 lg:py-12 flex items-center overflow-hidden">
+    <section className="py-8 lg:py-12 flex items-center overflow-hidden min-h-[700px] lg:min-h-[800px]">
       <div className="container mx-auto px-4 lg:px-8 h-full">
         <div className="grid grid-cols-1 lg:grid-cols-[30%_40%_30%] gap-4 lg:gap-6 items-start h-full">
           {/* Left Column - Branding */}
-          <div className="order-2 lg:order-1">
+          <div className="order-2 lg:order-1 min-h-[600px] lg:min-h-[700px]">
             <HeroBranding />
           </div>
 
@@ -114,7 +114,7 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
           </div>
 
           {/* Right Column - Command Panel */}
-          <div className="order-3">
+          <div className="order-3 min-h-[600px] lg:min-h-[700px]">
             <CommandPanel
               brands={transformedBrands}
               selectedBrand={selectedBrand}
