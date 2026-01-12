@@ -52,6 +52,11 @@
     --garage: 210 50% 25%;
     --garage-foreground: 0 0% 100%;
 
+    /* Difficulty semantic colors */
+    --difficulty-easy: 142 71% 45%; /* Green #22c55e */
+    --difficulty-medium: 38 92% 50%; /* Orange #f59e0b */
+    --difficulty-hard: 0 84% 60%; /* Red #ef4444 */
+
     /* Sidebar tokens */
     --sidebar-background: 30 14% 95%;
     --sidebar-foreground: 0 0% 10%;
@@ -101,6 +106,11 @@
     /* Garage color - Petrol Blue (dark mode) */
     --garage: 210 50% 45%;
     --garage-foreground: 0 0% 100%;
+
+    /* Difficulty semantic colors (dark mode) */
+    --difficulty-easy: 142 71% 45%;
+    --difficulty-medium: 38 92% 50%;
+    --difficulty-hard: 0 84% 60%;
 
     --sidebar-background: 0 0% 10%;
     --sidebar-foreground: 30 14% 95%;

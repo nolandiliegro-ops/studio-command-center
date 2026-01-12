@@ -142,10 +142,12 @@ export type Database = {
           created_at: string
           description: string | null
           difficulty_level: number | null
+          estimated_install_time_minutes: number | null
           id: string
           image_url: string | null
           name: string
           price: number | null
+          required_tools: string[] | null
           slug: string
           stock_quantity: number | null
           technical_metadata: Json | null
@@ -157,10 +159,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           difficulty_level?: number | null
+          estimated_install_time_minutes?: number | null
           id?: string
           image_url?: string | null
           name: string
           price?: number | null
+          required_tools?: string[] | null
           slug: string
           stock_quantity?: number | null
           technical_metadata?: Json | null
@@ -172,10 +176,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           difficulty_level?: number | null
+          estimated_install_time_minutes?: number | null
           id?: string
           image_url?: string | null
           name?: string
           price?: number | null
+          required_tools?: string[] | null
           slug?: string
           stock_quantity?: number | null
           technical_metadata?: Json | null

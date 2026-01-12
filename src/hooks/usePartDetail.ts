@@ -12,6 +12,8 @@ export interface PartDetail {
   image_url: string | null;
   youtube_video_id: string | null;
   technical_metadata: Record<string, unknown> | null;
+  estimated_install_time_minutes: number | null;
+  required_tools: string[] | null;
   category: {
     name: string;
     slug: string;
@@ -47,6 +49,8 @@ export const usePartBySlug = (slug: string | undefined) => {
           image_url,
           youtube_video_id,
           technical_metadata,
+          estimated_install_time_minutes,
+          required_tools,
           categories (
             name,
             slug,

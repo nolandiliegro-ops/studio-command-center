@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import MediaGallery from "@/components/pdp/MediaGallery";
 import PurchaseBlock from "@/components/pdp/PurchaseBlock";
 import EngineeringLab from "@/components/pdp/EngineeringLab";
+import InstallationGuide from "@/components/pdp/InstallationGuide";
 import CompatibilityMatrix from "@/components/pdp/CompatibilityMatrix";
 import WorkshopSection from "@/components/pdp/WorkshopSection";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -87,7 +88,7 @@ const PartDetail = () => {
 
         {/* Bento Grid Container */}
         <div className="flex-1 px-6 lg:px-8 pb-6 overflow-hidden">
-          <div className="h-full max-w-7xl mx-auto grid grid-cols-3 grid-rows-[1.6fr_1fr] gap-4 lg:gap-6">
+          <div className="h-full max-w-7xl mx-auto grid grid-cols-4 grid-rows-[1.6fr_1fr] gap-4 lg:gap-6">
             {/* Row 1 */}
             <div className="col-span-2 row-span-1">
               <MediaGallery imageUrl={part.image_url} productName={part.name} />
@@ -102,7 +103,14 @@ const PartDetail = () => {
               />
             </div>
 
-            {/* Row 2 */}
+            {/* Row 2 - 4 columns */}
+            <div className="col-span-1 row-span-1">
+              <InstallationGuide
+                difficultyLevel={part.difficulty_level}
+                estimatedTime={part.estimated_install_time_minutes}
+                requiredTools={part.required_tools}
+              />
+            </div>
             <div className="col-span-1 row-span-1">
               <EngineeringLab
                 technicalMetadata={part.technical_metadata}
@@ -148,6 +156,13 @@ const PartDetail = () => {
           stockQuantity={part.stock_quantity}
           categoryName={part.category?.name ?? null}
           categoryIcon={part.category?.icon ?? null}
+        />
+
+        {/* Installation Guide */}
+        <InstallationGuide
+          difficultyLevel={part.difficulty_level}
+          estimatedTime={part.estimated_install_time_minutes}
+          requiredTools={part.required_tools}
         />
 
         {/* Engineering Lab */}
