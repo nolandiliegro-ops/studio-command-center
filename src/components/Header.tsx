@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import logoImage from "@/assets/logo-pt.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,13 +42,12 @@ const Header = () => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-display text-xl">
-              PT
-            </div>
-            <span className="hidden sm:block text-lg font-medium">
-              pièces<span className="text-primary font-semibold">trottinettes</span>
-            </span>
+          <Link to="/" className="flex items-center group hover:opacity-90 transition-opacity">
+            <img 
+              src={logoImage}
+              alt="piècestrottinettes.FR"
+              className="h-10 lg:h-11 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation */}

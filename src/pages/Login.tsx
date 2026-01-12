@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2, LogIn, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
+import logoImage from '@/assets/logo-pt.png';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Email invalide" }),
@@ -94,9 +95,11 @@ const Login = () => {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-xl bg-garage mx-auto flex items-center justify-center text-garage-foreground font-display text-3xl mb-4">
-              PT
-            </div>
+            <img 
+              src={logoImage}
+              alt="piècestrottinettes.FR"
+              className="h-14 w-auto mx-auto mb-6"
+            />
             <h1 className="font-display text-4xl text-carbon tracking-wide">CONNEXION</h1>
             <p className="text-carbon/60 mt-2">Accédez à votre garage personnel</p>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import CompatiblePartsSection from "@/components/CompatiblePartsSection";
 import FavoritesSection from "@/components/home/FavoritesSection";
@@ -51,6 +52,9 @@ const Index = () => {
             activeModelName={activeModelName || undefined}
           />
         </motion.section>
+
+        {/* Footer */}
+        <Footer />
       </main>
 
       {/* Subtle ambient effects */}
