@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,8 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Loader2, Upload, Check, X, Image as ImageIcon, Save, Plus, Trash2, Edit, Download, Search } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Loader2, Upload, Check, X, Image as ImageIcon, Save, Plus, Trash2, Edit, Download, Search, FileUp } from 'lucide-react';
 import { toast } from 'sonner';
+import Papa from 'papaparse';
 
 interface Part {
   id: string;
@@ -53,6 +55,13 @@ const PartsManager = () => {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  
+  // CSV Import state
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [importResults, setImportResults] = useState<{ success: number; errors: string[] } | null>(null);
+  const csvInputRef = useRef<HTMLInputElement>(null);
 
   const [newPart, setNewPart] = useState({
     name: '',
@@ -295,7 +304,7 @@ const PartsManager = () => {
   };
 
   const exportCSV = () => {
-    const headers = ['Nom', 'Slug', 'Catégorie', 'Prix', 'Stock', 'Difficulté', 'Temps Install', 'Outils', 'YouTube ID'];
+    const headers = ['Nom', 'Slug', 'Catégorie', 'Prix', 'Stock', 'Difficulté', 'Temps Install', 'Outils', 'YouTube ID', 'Description'];
     const rows = parts.map(p => [
       p.name,
       p.slug,
@@ -305,17 +314,130 @@ const PartsManager = () => {
       p.difficulty_level?.toString() || '',
       p.estimated_install_time_minutes?.toString() || '',
       p.required_tools?.join('; ') || '',
-      p.youtube_video_id || ''
+      p.youtube_video_id || '',
+      p.description || ''
     ]);
 
-    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(','))].join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = `pieces-${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     toast.success('Export CSV téléchargé');
+  };
+
+  const handleCSVImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    setImportProgress(0);
+    setImportResults(null);
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const rows = results.data as Record<string, string>[];
+        const errors: string[] = [];
+        let successCount = 0;
+
+        // Create a map of category names (lowercase) to IDs
+        const categoryMap = new Map<string, string>();
+        categories.forEach(cat => {
+          categoryMap.set(cat.name.toLowerCase(), cat.id);
+          // Also add slug-like versions
+          categoryMap.set(slugify(cat.name), cat.id);
+        });
+
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          setImportProgress(Math.round(((i + 1) / rows.length) * 100));
+
+          // Get the name from various possible column names
+          const name = row['Nom'] || row['nom'] || row['Name'] || row['name'] || '';
+          if (!name.trim()) {
+            errors.push(`Ligne ${i + 2}: Nom manquant`);
+            continue;
+          }
+
+          // Map category name to ID
+          const categoryName = row['Catégorie'] || row['categorie'] || row['Category'] || row['category'] || '';
+          let categoryId: string | null = null;
+          
+          if (categoryName.trim()) {
+            const normalizedCat = categoryName.toLowerCase().trim();
+            categoryId = categoryMap.get(normalizedCat) || categoryMap.get(slugify(normalizedCat)) || null;
+            
+            if (!categoryId) {
+              errors.push(`Ligne ${i + 2}: Catégorie "${categoryName}" non trouvée`);
+            }
+          }
+
+          // Parse other fields
+          const priceStr = row['Prix'] || row['prix'] || row['Price'] || row['price'] || '';
+          const stockStr = row['Stock'] || row['stock'] || row['Quantity'] || row['quantity'] || '';
+          const difficultyStr = row['Difficulté'] || row['difficulte'] || row['Difficulty'] || row['difficulty'] || '';
+          const installTimeStr = row['Temps Install'] || row['temps_install'] || row['Install Time'] || row['install_time'] || '';
+          const toolsStr = row['Outils'] || row['outils'] || row['Tools'] || row['tools'] || '';
+          const youtubeId = row['YouTube ID'] || row['youtube_id'] || row['Video ID'] || row['video_id'] || '';
+          const description = row['Description'] || row['description'] || '';
+
+          try {
+            const slug = slugify(name);
+            const { error } = await supabase
+              .from('parts')
+              .insert({
+                name: name.trim(),
+                slug,
+                category_id: categoryId,
+                price: priceStr ? parseFloat(priceStr.replace(',', '.').replace('€', '').trim()) : null,
+                stock_quantity: stockStr ? parseInt(stockStr) : 0,
+                difficulty_level: difficultyStr ? parseInt(difficultyStr) : null,
+                estimated_install_time_minutes: installTimeStr ? parseInt(installTimeStr) : null,
+                required_tools: toolsStr ? toolsStr.split(/[;,]/).map(t => t.trim()).filter(Boolean) : null,
+                youtube_video_id: youtubeId.trim() || null,
+                description: description.trim() || null
+              });
+
+            if (error) {
+              if (error.code === '23505') {
+                errors.push(`Ligne ${i + 2}: "${name}" existe déjà (slug: ${slug})`);
+              } else {
+                errors.push(`Ligne ${i + 2}: ${error.message}`);
+              }
+            } else {
+              successCount++;
+            }
+          } catch (err) {
+            errors.push(`Ligne ${i + 2}: Erreur inattendue`);
+          }
+        }
+
+        setImportResults({ success: successCount, errors });
+        setImporting(false);
+        
+        if (successCount > 0) {
+          fetchParts(); // Refresh the list
+          toast.success(`${successCount} pièce(s) importée(s)`);
+        }
+        
+        if (errors.length > 0) {
+          toast.error(`${errors.length} erreur(s) lors de l'import`);
+        }
+      },
+      error: (error) => {
+        setImporting(false);
+        toast.error(`Erreur de parsing CSV: ${error.message}`);
+      }
+    });
+
+    // Reset input
+    if (csvInputRef.current) {
+      csvInputRef.current.value = '';
+    }
   };
 
   const isPlaceholder = (url: string | null) => {
@@ -364,6 +486,106 @@ const PartsManager = () => {
         </div>
         
         <div className="flex items-center gap-2">
+          <Dialog open={isImportOpen} onOpenChange={(open) => {
+            setIsImportOpen(open);
+            if (!open) {
+              setImportResults(null);
+              setImportProgress(0);
+            }
+          }}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <FileUp className="w-4 h-4" />
+                Import CSV
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Importer des pièces (CSV)</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Format attendu (colonnes)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Nom*, Catégorie, Prix, Stock, Difficulté, Temps Install, Outils, YouTube ID, Description
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    * = obligatoire. Les catégories sont mappées par nom (ex: "Pneus", "Freins").
+                    Les slugs sont générés automatiquement.
+                  </p>
+                </div>
+                
+                {!importing && !importResults && (
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-lg p-8 hover:border-primary/50 transition-colors">
+                    <FileUp className="w-10 h-10 text-muted-foreground mb-4" />
+                    <p className="text-sm text-muted-foreground mb-4">Sélectionnez un fichier CSV</p>
+                    <input
+                      ref={csvInputRef}
+                      type="file"
+                      accept=".csv,text/csv"
+                      onChange={handleCSVImport}
+                      className="hidden"
+                      id="csv-import-input"
+                    />
+                    <Button asChild variant="outline">
+                      <label htmlFor="csv-import-input" className="cursor-pointer">
+                        Parcourir...
+                      </label>
+                    </Button>
+                  </div>
+                )}
+
+                {importing && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                      <span className="text-sm">Import en cours...</span>
+                    </div>
+                    <Progress value={importProgress} className="h-2" />
+                    <p className="text-xs text-muted-foreground text-center">{importProgress}%</p>
+                  </div>
+                )}
+
+                {importResults && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-primary">
+                      <Check className="w-5 h-5" />
+                      <span className="font-medium">{importResults.success} pièce(s) importée(s)</span>
+                    </div>
+                    
+                    {importResults.errors.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-destructive">
+                          <X className="w-5 h-5" />
+                          <span className="font-medium">{importResults.errors.length} erreur(s)</span>
+                        </div>
+                        <div className="max-h-32 overflow-y-auto bg-muted/50 rounded-lg p-3 text-xs space-y-1">
+                          {importResults.errors.slice(0, 10).map((err, idx) => (
+                            <p key={idx} className="text-destructive">{err}</p>
+                          ))}
+                          {importResults.errors.length > 10 && (
+                            <p className="text-muted-foreground">... et {importResults.errors.length - 10} autres erreurs</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      onClick={() => {
+                        setImportResults(null);
+                        setImportProgress(0);
+                      }}
+                    >
+                      Importer un autre fichier
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           <Button variant="outline" onClick={exportCSV} className="gap-2">
             <Download className="w-4 h-4" />
             Export CSV
