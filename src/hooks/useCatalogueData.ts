@@ -2,13 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CompatiblePart } from "@/hooks/useScooterData";
 
+// Extended part type with category_id for filtering
+export interface CataloguePart extends CompatiblePart {
+  category_id: string | null;
+}
+
 /**
  * Hook to fetch all parts with optional category filter
  */
 export const useAllParts = (categoryId: string | null) => {
   return useQuery({
     queryKey: ["all_parts", categoryId],
-    queryFn: async (): Promise<CompatiblePart[]> => {
+    queryFn: async (): Promise<CataloguePart[]> => {
       let query = supabase
         .from("parts")
         .select(`
@@ -21,6 +26,7 @@ export const useAllParts = (categoryId: string | null) => {
           difficulty_level,
           stock_quantity,
           technical_metadata,
+          category_id,
           category:categories (
             id,
             name,

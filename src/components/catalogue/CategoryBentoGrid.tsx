@@ -18,6 +18,7 @@ interface Category {
   name: string;
   icon: string | null;
   slug: string;
+  parent_id?: string | null;
 }
 
 interface CategoryBentoGridProps {

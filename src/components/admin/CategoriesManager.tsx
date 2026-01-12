@@ -3,14 +3,33 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Plus, Trash2, Edit, Save, Tag, FolderTree, Globe } from 'lucide-react';
+import { Loader2, Plus, Trash2, Edit, Save, Tag, FolderTree, Globe, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { cn } from '@/lib/utils';
 
 interface Category {
   id: string;
@@ -33,6 +52,121 @@ const slugify = (text: string) => {
     .replace(/(^-|-$)/g, '');
 };
 
+// Sortable Row Component
+const SortableRow = ({ 
+  category, 
+  getParentName, 
+  startEditing, 
+  deleteCategory, 
+  deleting,
+  isDragging 
+}: {
+  category: Category;
+  getParentName: (id: string | null) => string | null;
+  startEditing: (cat: Category) => void;
+  deleteCategory: (cat: Category) => void;
+  deleting: string | null;
+  isDragging?: boolean;
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging: isSortableDragging,
+  } = useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <tr
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "border-b transition-colors hover:bg-primary/5",
+        isSortableDragging && "opacity-50 bg-primary/10",
+        isDragging && "shadow-lg"
+      )}
+    >
+      <td className="p-4 w-10">
+        <button
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded touch-none"
+        >
+          <GripVertical className="w-4 h-4 text-muted-foreground" />
+        </button>
+      </td>
+      <td className="p-4">
+        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-lg">
+          {category.icon || <Tag className="w-4 h-4 text-primary" />}
+        </div>
+      </td>
+      <td className="p-4 font-medium">
+        <div className="flex items-center gap-2">
+          {category.parent_id && (
+            <span className="text-muted-foreground">└</span>
+          )}
+          <span className={category.parent_id ? 'text-muted-foreground' : ''}>
+            {category.name}
+          </span>
+          {category.parent_id && (
+            <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+              {getParentName(category.parent_id)}
+            </span>
+          )}
+        </div>
+      </td>
+      <td className="p-4 text-muted-foreground text-sm">{category.slug}</td>
+      <td className="p-4">{category.display_order ?? 0}</td>
+      <td className="p-4">
+        <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
+          {category.product_count ?? 0}
+        </span>
+      </td>
+      <td className="p-4">
+        {category.meta_title || category.meta_description ? (
+          <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-600">OK</span>
+        ) : (
+          <span className="text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-600">—</span>
+        )}
+      </td>
+      <td className="p-4">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => startEditing(category)} className="h-8 w-8">
+            <Edit className="w-4 h-4" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" disabled={deleting === category.id}>
+                {deleting === category.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Supprimer "{category.name}" ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Cette action supprimera la catégorie. Les pièces liées devront être réaffectées.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={() => deleteCategory(category)} className="bg-destructive hover:bg-destructive/90">
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </td>
+    </tr>
+  );
+};
+
 const CategoriesManager = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +175,7 @@ const CategoriesManager = () => {
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const [newCategory, setNewCategory] = useState({
     name: '',
@@ -60,6 +195,17 @@ const CategoriesManager = () => {
     meta_title: '',
     meta_description: ''
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     fetchCategories();
@@ -229,6 +375,54 @@ const CategoriesManager = () => {
     }
   };
 
+  // Handle drag end - update order
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = categories.findIndex(c => c.id === active.id);
+    const newIndex = categories.findIndex(c => c.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const newCategories = arrayMove(categories, oldIndex, newIndex);
+    
+    // Update display_order for all moved categories
+    const updatedCategories = newCategories.map((cat, index) => ({
+      ...cat,
+      display_order: index
+    }));
+
+    setCategories(updatedCategories);
+
+    // Save to database
+    try {
+      const updates = updatedCategories.map(cat => ({
+        id: cat.id,
+        display_order: cat.display_order
+      }));
+
+      for (const update of updates) {
+        await supabase
+          .from('categories')
+          .update({ display_order: update.display_order })
+          .eq('id', update.id);
+      }
+
+      toast.success('Ordre mis à jour');
+    } catch (error) {
+      console.error('Error updating order:', error);
+      toast.error('Erreur lors de la mise à jour');
+      fetchCategories(); // Revert on error
+    }
+  };
+
   // Organize categories hierarchically
   const organizedCategories = () => {
     const parents = categories.filter(c => !c.parent_id);
@@ -250,6 +444,8 @@ const CategoriesManager = () => {
 
     return result;
   };
+
+  const activeCategory = activeId ? categories.find(c => c.id === activeId) : null;
 
   if (loading) {
     return (
@@ -312,10 +508,18 @@ const CategoriesManager = () => {
     </Tabs>
   );
 
+  const organized = organizedCategories();
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{categories.length} catégorie(s)</p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted-foreground">{categories.length} catégorie(s)</p>
+          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full flex items-center gap-1">
+            <GripVertical className="w-3 h-3" />
+            Glisser pour réordonner
+          </span>
+        </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button className="bg-primary hover:bg-primary/90 gap-2">
@@ -341,87 +545,53 @@ const CategoriesManager = () => {
       </div>
 
       <div className="rounded-lg border border-border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-foreground/5">
-              <TableHead className="w-16">Icône</TableHead>
-              <TableHead>Nom</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead className="w-20">Ordre</TableHead>
-              <TableHead className="w-24">Pièces</TableHead>
-              <TableHead className="w-24">SEO</TableHead>
-              <TableHead className="w-32">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {organizedCategories().map((category) => (
-              <TableRow key={category.id} className="hover:bg-primary/5">
-                <TableCell>
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-lg">
-                    {category.icon || <Tag className="w-4 h-4 text-primary" />}
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium">
-                  <div className="flex items-center gap-2">
-                    {category.parent_id && (
-                      <span className="text-muted-foreground">└</span>
-                    )}
-                    <span className={category.parent_id ? 'text-muted-foreground' : ''}>
-                      {category.name}
-                    </span>
-                    {category.parent_id && (
-                      <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                        {getParentName(category.parent_id)}
-                      </span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-muted-foreground text-sm">{category.slug}</TableCell>
-                <TableCell>{category.display_order ?? 0}</TableCell>
-                <TableCell>
-                  <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-                    {category.product_count ?? 0}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {category.meta_title || category.meta_description ? (
-                    <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-600">OK</span>
-                  ) : (
-                    <span className="text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-600">—</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => startEditing(category)} className="h-8 w-8">
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" disabled={deleting === category.id}>
-                          {deleting === category.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Supprimer "{category.name}" ?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Cette action supprimera la catégorie. Les pièces liées devront être réaffectées.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Annuler</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => deleteCategory(category)} className="bg-destructive hover:bg-destructive/90">
-                            Supprimer
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <table className="w-full">
+            <thead>
+              <tr className="bg-foreground/5 border-b">
+                <th className="p-4 text-left w-10"></th>
+                <th className="p-4 text-left w-16 font-medium text-sm">Icône</th>
+                <th className="p-4 text-left font-medium text-sm">Nom</th>
+                <th className="p-4 text-left font-medium text-sm">Slug</th>
+                <th className="p-4 text-left w-20 font-medium text-sm">Ordre</th>
+                <th className="p-4 text-left w-24 font-medium text-sm">Pièces</th>
+                <th className="p-4 text-left w-24 font-medium text-sm">SEO</th>
+                <th className="p-4 text-left w-32 font-medium text-sm">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <SortableContext items={organized.map(c => c.id)} strategy={verticalListSortingStrategy}>
+                {organized.map((category) => (
+                  <SortableRow
+                    key={category.id}
+                    category={category}
+                    getParentName={getParentName}
+                    startEditing={startEditing}
+                    deleteCategory={deleteCategory}
+                    deleting={deleting}
+                  />
+                ))}
+              </SortableContext>
+            </tbody>
+          </table>
+
+          <DragOverlay>
+            {activeCategory && (
+              <div className="bg-white shadow-xl rounded-lg p-4 border-2 border-primary flex items-center gap-3">
+                <GripVertical className="w-4 h-4 text-muted-foreground" />
+                <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
+                  {activeCategory.icon || <Tag className="w-3 h-3 text-primary" />}
+                </div>
+                <span className="font-medium">{activeCategory.name}</span>
+              </div>
+            )}
+          </DragOverlay>
+        </DndContext>
       </div>
 
       {/* Edit Dialog */}
