@@ -114,13 +114,13 @@ const ExpertTrackingWidget = ({
   return (
     <>
       <div className={cn(
-        "bg-white/60 border border-mineral/20 rounded-xl p-4 space-y-3",
+        "bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 space-y-3 shadow-xl",
         className
       )}>
         {/* Header */}
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-mineral" />
-          <h3 className="font-display text-xs text-carbon uppercase tracking-wide">
+          <h3 className="font-display text-xs text-white uppercase tracking-wide">
             Suivi Expert
           </h3>
         </div>

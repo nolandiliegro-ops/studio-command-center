@@ -63,8 +63,8 @@ const ProductsUsed = ({ scooterId, scooterName, parts, loading, className }: Pro
             <Package className="w-5 h-5 text-mineral" />
           </div>
           <div>
-            <h3 className="font-display text-xl text-carbon">PIÈCES COMPATIBLES</h3>
-            <p className="text-xs text-carbon/50">
+            <h3 className="font-display text-xl text-white">PIÈCES COMPATIBLES</h3>
+            <p className="text-xs text-white/50">
               {parts.length} {parts.length === 1 ? 'pièce disponible' : 'pièces disponibles'}
             </p>
           </div>
@@ -87,7 +87,7 @@ const ProductsUsed = ({ scooterId, scooterName, parts, loading, className }: Pro
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
             className={cn(
-              "group relative bg-white/60 border border-mineral/20 rounded-xl p-4",
+              "group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4",
               "hover:shadow-lg hover:border-mineral/40 transition-all duration-300",
               "cursor-pointer"
             )}
@@ -126,16 +126,16 @@ const ProductsUsed = ({ scooterId, scooterName, parts, loading, className }: Pro
               </p>
 
               {/* Name */}
-              <h4 className="text-sm font-semibold text-carbon line-clamp-2 leading-tight">
+              <h4 className="text-sm font-semibold text-white line-clamp-2 leading-tight">
                 {part.name}
               </h4>
 
               {/* Price */}
               <div className="flex items-baseline gap-1">
-                <span className="text-lg font-bold text-carbon">
+                <span className="text-lg font-bold text-white">
                   {part.price.toFixed(2)}
                 </span>
-                <span className="text-xs text-carbon/50">€</span>
+                <span className="text-xs text-white/50">€</span>
               </div>
             </div>
 

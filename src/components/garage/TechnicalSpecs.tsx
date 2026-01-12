@@ -11,41 +11,56 @@ interface TechnicalSpecsProps {
 
 const TechnicalSpecs = ({ voltage, amperage, power, className }: TechnicalSpecsProps) => {
   return (
-    <div className={cn("grid grid-cols-3 gap-2", className)}>
-      {/* Voltage - Amber/Orange */}
+    <div className={cn("grid grid-cols-3 gap-3", className)}>
+      {/* Voltage - Orange to Peach Gradient */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center"
+        className="relative bg-gradient-to-br from-orange-500/90 to-orange-300/80 rounded-2xl p-4 text-center overflow-hidden shadow-lg"
       >
-        <Zap className="w-5 h-5 text-amber-600 mx-auto mb-1" />
-        <p className="text-2xl font-bold text-amber-700">{voltage || '-'}</p>
-        <p className="text-xs text-amber-600/70 font-medium uppercase tracking-wide">V</p>
+        <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+        <div className="relative z-10">
+          <div className="w-10 h-10 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-3xl font-bold text-white mb-0.5">{voltage || '-'}</p>
+          <p className="text-xs text-white/80 font-semibold uppercase tracking-wider">VOLTAGE</p>
+        </div>
       </motion.div>
 
-      {/* Amperage - Blue */}
+      {/* Amperage - Blue to Cyan Gradient */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
-        className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center"
+        className="relative bg-gradient-to-br from-blue-500/90 to-cyan-400/80 rounded-2xl p-4 text-center overflow-hidden shadow-lg"
       >
-        <Gauge className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-        <p className="text-2xl font-bold text-blue-700">{amperage || '-'}</p>
-        <p className="text-xs text-blue-600/70 font-medium uppercase tracking-wide">Ah</p>
+        <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+        <div className="relative z-10">
+          <div className="w-10 h-10 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center">
+            <Gauge className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-3xl font-bold text-white mb-0.5">{amperage || '-'}</p>
+          <p className="text-xs text-white/80 font-semibold uppercase tracking-wider">CURRENT</p>
+        </div>
       </motion.div>
 
-      {/* Power - Emerald/Green */}
+      {/* Power - Green to Teal Gradient */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.3 }}
-        className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center"
+        className="relative bg-gradient-to-br from-emerald-500/90 to-teal-400/80 rounded-2xl p-4 text-center overflow-hidden shadow-lg"
       >
-        <Activity className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
-        <p className="text-2xl font-bold text-emerald-700">{power || '-'}</p>
-        <p className="text-xs text-emerald-600/70 font-medium uppercase tracking-wide">W</p>
+        <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+        <div className="relative z-10">
+          <div className="w-10 h-10 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center">
+            <Activity className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-3xl font-bold text-white mb-0.5">{power || '-'}</p>
+          <p className="text-xs text-white/80 font-semibold uppercase tracking-wider">POWER</p>
+        </div>
       </motion.div>
     </div>
   );

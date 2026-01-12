@@ -27,7 +27,7 @@ const PerformanceWidget = ({ points, displayName, className }: PerformanceWidget
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
       className={cn(
-        "relative bg-white/60 border border-mineral/20 rounded-2xl p-6",
+        "relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl",
         "hover:shadow-lg hover:border-mineral/30 transition-all duration-300",
         className
       )}
@@ -41,10 +41,10 @@ const PerformanceWidget = ({ points, displayName, className }: PerformanceWidget
             <Trophy className="w-7 h-7 text-mineral" />
           </div>
           <div>
-            <h2 className="font-display text-xl text-carbon tracking-wide">
+            <h2 className="font-display text-xl text-white tracking-wide">
               PERFORMANCE
             </h2>
-            <p className="text-xs text-carbon/50 mt-1">
+            <p className="text-xs text-white/50 mt-1">
               {displayName}
             </p>
           </div>
@@ -59,7 +59,7 @@ const PerformanceWidget = ({ points, displayName, className }: PerformanceWidget
           >
             {points.toLocaleString('fr-FR')}
           </motion.span>
-          <span className="text-sm text-carbon/60">pts</span>
+          <span className="text-sm text-white/60">pts</span>
         </div>
 
         {/* Right: Level Badge and Progress */}
@@ -72,7 +72,7 @@ const PerformanceWidget = ({ points, displayName, className }: PerformanceWidget
           
           {/* Progress Bar */}
           <div className="w-full space-y-1">
-            <div className="flex items-center justify-between text-xs text-carbon/50">
+            <div className="flex items-center justify-between text-xs text-white/50">
               <span>Progression</span>
               <div className="flex items-center gap-1">
                 <TrendingUp className="w-3 h-3 text-mineral" />
@@ -87,7 +87,7 @@ const PerformanceWidget = ({ points, displayName, className }: PerformanceWidget
                 className="h-full bg-mineral rounded-full"
               />
             </div>
-            <p className="text-xs text-carbon/40 text-right">
+            <p className="text-xs text-white/40 text-right">
               {pointsToNext} pts jusqu'au prochain niveau
             </p>
           </div>

@@ -114,7 +114,7 @@ const GarageScooterCarousel = ({ scooters, onScooterChange, className }: GarageS
   return (
     <div className={cn("relative h-full flex flex-col", className)}>
       {/* Main Image Container - Takes up available space */}
-      <div className="relative flex-1 bg-white/60 border border-mineral/20 rounded-2xl overflow-hidden">
+      <div className="relative flex-1 bg-[#3A3A3A] border border-white/10 rounded-2xl overflow-hidden shadow-xl">
         
         {/* Brand Badge */}
         <div className="absolute top-3 left-3 z-10 px-3 py-1.5 bg-white/80 backdrop-blur-sm rounded-full border border-mineral/20 shadow-sm">
@@ -133,7 +133,7 @@ const GarageScooterCarousel = ({ scooters, onScooterChange, className }: GarageS
         {/* Studio Spotlight Container */}
         <div 
           className="absolute inset-0"
-          style={{ backgroundColor: '#F5F3F0' }}
+          style={{ backgroundColor: '#3A3A3A' }}
         >
           {/* Subtle Spotlight Effect */}
           <div 
