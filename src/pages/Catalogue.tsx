@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Loader2, Sparkles, Filter } from "lucide-react";
@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import CategoryBentoGrid from "@/components/catalogue/CategoryBentoGrid";
+import SubCategoryBar from "@/components/catalogue/SubCategoryBar";
 import PartCard from "@/components/parts/PartCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -64,6 +65,7 @@ const EmptyState = ({ onClear }: { onClear: () => void }) => (
 const Catalogue = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const queryClient = useQueryClient();
@@ -72,8 +74,60 @@ const Catalogue = () => {
   const scooterIdFilter = searchParams.get("scooter");
   
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
-  const { data: parts = [], isLoading: partsLoading } = useAllParts(activeCategory);
   const { data: scooterModels = [] } = useScooterModels();
+
+  // Séparer catégories parentes et sous-catégories
+  const parentCategories = useMemo(() => 
+    categories.filter(c => !c.parent_id), 
+    [categories]
+  );
+
+  const subCategories = useMemo(() => 
+    activeCategory 
+      ? categories.filter(c => c.parent_id === activeCategory)
+      : [],
+    [categories, activeCategory]
+  );
+
+  // Déterminer le nom de la catégorie parente active
+  const activeParentName = useMemo(() => {
+    if (!activeCategory) return undefined;
+    return categories.find(c => c.id === activeCategory)?.name;
+  }, [categories, activeCategory]);
+
+  // Logique de filtrage intelligent
+  const effectiveCategoryFilter = useMemo(() => {
+    // Si une sous-catégorie est sélectionnée, filtrer par celle-ci
+    if (activeSubCategory) return activeSubCategory;
+    
+    // Si une catégorie parente est sélectionnée et a des sous-catégories,
+    // on veut afficher TOUTES les pièces des sous-catégories
+    if (activeCategory && subCategories.length > 0) {
+      // Retourner null pour ne pas filtrer ici, on le fera manuellement
+      return null;
+    }
+    
+    // Sinon, filtrer par la catégorie parente directement
+    return activeCategory;
+  }, [activeCategory, activeSubCategory, subCategories]);
+
+  const { data: allParts = [], isLoading: partsLoading } = useAllParts(effectiveCategoryFilter);
+
+  // Filtrer manuellement si on a une catégorie parente avec sous-catégories
+  const parts = useMemo(() => {
+    if (activeCategory && subCategories.length > 0 && !activeSubCategory) {
+      // Récupérer les IDs de toutes les sous-catégories + la catégorie parente
+      const validCategoryIds = new Set([activeCategory, ...subCategories.map(sc => sc.id)]);
+      return allParts.filter(p => p.category_id && validCategoryIds.has(p.category_id));
+    }
+    return allParts;
+  }, [allParts, activeCategory, activeSubCategory, subCategories]);
+
+  // Reset sous-catégorie quand on change de catégorie parente
+  const handleCategoryChange = (categoryId: string | null) => {
+    setActiveCategory(categoryId);
+    setActiveSubCategory(null);
+  };
   
   // Find the scooter model name for display
   const filteredScooterModel = scooterIdFilter 
@@ -199,14 +253,28 @@ const Catalogue = () => {
           )}
         </section>
 
-        {/* Category Bento Grid */}
-        <section className="container mx-auto px-4 pb-6">
+        {/* Category Bento Grid - Only parent categories */}
+        <section className="container mx-auto px-4 pb-4">
           <CategoryBentoGrid
-            categories={categories}
+            categories={parentCategories}
             activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
+            onCategoryChange={handleCategoryChange}
             isLoading={categoriesLoading}
           />
+        </section>
+
+        {/* Sub-Category Bar - Appears when parent has children */}
+        <section className="container mx-auto px-4">
+          <AnimatePresence>
+            {activeCategory && subCategories.length > 0 && (
+              <SubCategoryBar
+                subCategories={subCategories}
+                activeSubCategory={activeSubCategory}
+                onSubCategoryChange={setActiveSubCategory}
+                parentName={activeParentName}
+              />
+            )}
+          </AnimatePresence>
         </section>
 
         {/* Product Grid - visible above the fold */}

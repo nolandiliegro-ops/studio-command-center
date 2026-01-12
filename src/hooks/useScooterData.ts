@@ -70,19 +70,66 @@ export const useScooterModels = (brandSlug?: string | null) => {
   });
 };
 
+// Interface pour les catégories avec parent_id
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string | null;
+  display_order: number | null;
+  parent_id: string | null;
+}
+
 // Hook pour récupérer les catégories
 export const useCategories = () => {
   return useQuery({
     queryKey: ["categories"],
-    queryFn: async () => {
+    queryFn: async (): Promise<Category[]> => {
       const { data, error } = await supabase
         .from("categories")
-        .select("*")
+        .select("id, name, slug, icon, display_order, parent_id")
         .order("display_order");
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
+  });
+};
+
+// Hook pour récupérer uniquement les catégories parentes (sans parent_id)
+export const useParentCategories = () => {
+  return useQuery({
+    queryKey: ["parent-categories"],
+    queryFn: async (): Promise<Category[]> => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name, slug, icon, display_order, parent_id")
+        .is("parent_id", null)
+        .order("display_order");
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+};
+
+// Hook pour récupérer les sous-catégories d'une catégorie parente
+export const useSubCategories = (parentId: string | null) => {
+  return useQuery({
+    queryKey: ["sub-categories", parentId],
+    queryFn: async (): Promise<Category[]> => {
+      if (!parentId) return [];
+      
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name, slug, icon, display_order, parent_id")
+        .eq("parent_id", parentId)
+        .order("display_order");
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!parentId,
   });
 };
 
