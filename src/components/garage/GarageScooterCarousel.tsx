@@ -114,7 +114,14 @@ const GarageScooterCarousel = ({ scooters, onScooterChange, className }: GarageS
   return (
     <div className={cn("relative h-full flex flex-col", className)}>
       {/* Main Image Container - Takes up available space */}
-      <div className="relative flex-1 bg-[#3A3A3A] border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+      <div 
+        className="relative flex-1 bg-[#3A3A3A] border border-white/10 rounded-2xl overflow-hidden shadow-xl"
+        style={{ 
+          backgroundImage: 'url(/garage-floor.png)', 
+          backgroundSize: 'cover', 
+          backgroundPosition: 'center' 
+        }}
+      >
         
         {/* Brand Badge */}
         <div className="absolute top-3 left-3 z-10 px-3 py-1.5 bg-white/80 backdrop-blur-sm rounded-full border border-mineral/20 shadow-sm">
