@@ -149,12 +149,66 @@ const ScooterCarousel = ({
         </Button>
       </motion.div>
 
-      {/* Counter at bottom center */}
-      <div className="absolute bottom-[8%] left-1/2 -translate-x-1/2 z-20">
-        <span className="text-sm text-muted-foreground font-medium bg-white/80 px-4 py-1.5 rounded-full backdrop-blur-sm shadow-sm border border-mineral/10">
-          {currentIndex + 1} / {totalModels}
-        </span>
-      </div>
+      {/* Dashboard Specs Bar - Bottom Center */}
+      <motion.div 
+        key={`specs-bar-${activeModel?.id}`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.4 }}
+        className="absolute bottom-[6%] left-1/2 -translate-x-1/2 z-20"
+      >
+        <div className="flex items-center gap-4 lg:gap-6 bg-white/90 backdrop-blur-md border border-mineral/20 rounded-2xl px-4 lg:px-6 py-2.5 lg:py-3 shadow-xl">
+          {/* Power */}
+          <div className="flex items-center gap-1.5">
+            <Zap className="w-4 h-4 lg:w-5 lg:h-5 text-mineral" />
+            <div className="flex items-baseline gap-0.5">
+              <AnimatedNumber 
+                value={activeModel ? parseSpecValue(activeModel.specs?.power || "0W") : 0}
+                className="font-display text-xl lg:text-2xl text-carbon"
+              />
+              <span className="text-xs text-muted-foreground font-medium">W</span>
+            </div>
+          </div>
+          
+          {/* Divider */}
+          <div className="h-6 lg:h-8 w-px bg-mineral/20" />
+          
+          {/* Speed */}
+          <div className="flex items-center gap-1.5">
+            <Gauge className="w-4 h-4 lg:w-5 lg:h-5 text-mineral" />
+            <div className="flex items-baseline gap-0.5">
+              <AnimatedNumber 
+                value={activeModel ? parseSpecValue(activeModel.specs?.maxSpeed || "0km/h") : 0}
+                className="font-display text-xl lg:text-2xl text-carbon"
+              />
+              <span className="text-xs text-muted-foreground font-medium">km/h</span>
+            </div>
+          </div>
+          
+          {/* Divider */}
+          <div className="h-6 lg:h-8 w-px bg-mineral/20" />
+          
+          {/* Range */}
+          <div className="flex items-center gap-1.5">
+            <Battery className="w-4 h-4 lg:w-5 lg:h-5 text-mineral" />
+            <div className="flex items-baseline gap-0.5">
+              <AnimatedNumber 
+                value={activeModel ? parseSpecValue(activeModel.specs?.range || "0km") : 0}
+                className="font-display text-xl lg:text-2xl text-carbon"
+              />
+              <span className="text-xs text-muted-foreground font-medium">km</span>
+            </div>
+          </div>
+          
+          {/* Divider */}
+          <div className="h-6 lg:h-8 w-px bg-mineral/20" />
+          
+          {/* Counter */}
+          <span className="text-sm text-muted-foreground font-medium">
+            {currentIndex + 1} / {totalModels}
+          </span>
+        </div>
+      </motion.div>
 
       {/* Main Layout: Carousel */}
       <div className="relative flex items-center justify-center w-full h-full px-16 lg:px-20">
@@ -249,61 +303,7 @@ const ScooterCarousel = ({
                       </motion.div>
                     </AnimatePresence>
 
-                    {/* Floating Spec Badges */}
-                    {isActive && (
-                      <>
-                        {/* Power Badge - Top Left */}
-                        <motion.div
-                          key={`power-${model.id}`}
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
-                          className="absolute left-4 top-[28%] bg-white/90 backdrop-blur-sm border border-mineral/20 rounded-xl px-3 py-2 shadow-lg z-10"
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <Zap className="w-4 h-4 text-mineral" />
-                            <span className="font-display text-lg text-carbon">
-                              {parseSpecValue(model.specs.power)}
-                            </span>
-                            <span className="text-xs text-muted-foreground font-medium">W</span>
-                          </div>
-                        </motion.div>
-
-                        {/* Speed Badge - Middle Right */}
-                        <motion.div
-                          key={`speed-${model.id}`}
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                          className="absolute right-4 top-[35%] bg-white/90 backdrop-blur-sm border border-mineral/20 rounded-xl px-3 py-2 shadow-lg z-10"
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <Gauge className="w-4 h-4 text-mineral" />
-                            <span className="font-display text-lg text-carbon">
-                              {parseSpecValue(model.specs.maxSpeed)}
-                            </span>
-                            <span className="text-xs text-muted-foreground font-medium">km/h</span>
-                          </div>
-                        </motion.div>
-
-                        {/* Range Badge - Above reflection */}
-                        <motion.div
-                          key={`range-${model.id}`}
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-                          className="absolute left-1/2 -translate-x-1/2 bottom-[28%] bg-white/90 backdrop-blur-sm border border-mineral/20 rounded-xl px-3 py-2 shadow-lg z-10"
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <Battery className="w-4 h-4 text-mineral" />
-                            <span className="font-display text-lg text-carbon">
-                              {parseSpecValue(model.specs.range)}
-                            </span>
-                            <span className="text-xs text-muted-foreground font-medium">km</span>
-                          </div>
-                        </motion.div>
-                      </>
-                    )}
+                    {/* Floating Spec Badges removed - Now in Dashboard bar below */}
                   </div>
                 </div>
               );
