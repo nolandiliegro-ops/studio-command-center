@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Zap, Gauge, Battery } from "lucide-react";
+import { ChevronLeft, ChevronRight, Zap, CircuitBoard, BatteryCharging, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ScooterModel } from "@/data/scooterData";
+import { ScooterModel, voltageOptions, amperageOptions } from "@/data/scooterData";
 import useEmblaCarousel from "embla-carousel-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedNumber from "@/components/ui/animated-number";
 import FavoriteButton from "@/components/garage/FavoriteButton";
 import GarageButton from "@/components/garage/GarageButton";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandItem, CommandList } from "@/components/ui/command";
 
 // Centralized image mapping
 import { scooterImages } from "@/lib/scooterImageMapping";
@@ -42,12 +44,25 @@ const ScooterCarousel = ({
   });
 
   const [prevActiveId, setPrevActiveId] = useState<string | null>(null);
+  const [selectedVoltage, setSelectedVoltage] = useState<number | null>(null);
+  const [selectedAmperage, setSelectedAmperage] = useState<number | null>(null);
+  const [voltageOpen, setVoltageOpen] = useState(false);
+  const [amperageOpen, setAmperageOpen] = useState(false);
+  
   const activeModel = models[activeIndex] || models[0];
+  
+  // Computed display values
+  const displayVoltage = selectedVoltage ?? activeModel?.voltage ?? 36;
+  const displayAmperage = selectedAmperage ?? activeModel?.amperage ?? 12;
+  const displayWattage = activeModel ? parseSpecValue(activeModel.specs?.power || "0W") : 0;
 
-  // Track model changes for animation trigger
+  // Track model changes for animation trigger + reset selectors
   useEffect(() => {
     if (activeModel && activeModel.id !== prevActiveId) {
       setPrevActiveId(activeModel.id);
+      // Reset to model defaults when changing scooter
+      setSelectedVoltage(null);
+      setSelectedAmperage(null);
     }
   }, [activeModel, prevActiveId]);
 
@@ -149,56 +164,107 @@ const ScooterCarousel = ({
         </Button>
       </motion.div>
 
-      {/* Dashboard Specs Bar - Bottom Left (offset to avoid Scanner button) */}
+      {/* Dashboard Specs Bar - Interactive with Voltage/Amperage selectors */}
       <motion.div 
         key={`specs-bar-${activeModel?.id}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.4 }}
-        className="absolute bottom-[12%] lg:bottom-[14%] left-[42%] lg:left-[45%] -translate-x-1/2 z-20"
+        className="absolute bottom-[12%] lg:bottom-[14%] left-[42%] lg:left-[45%] -translate-x-1/2 z-30"
       >
-        <div className="flex items-center gap-4 lg:gap-6 bg-white/90 backdrop-blur-md border border-mineral/20 rounded-2xl px-4 lg:px-6 py-2.5 lg:py-3 shadow-xl">
-          {/* Model Name */}
-          <div className="flex items-center gap-1.5">
-            <Gauge className="w-4 h-4 lg:w-5 lg:h-5 text-mineral" />
-            <span className="font-display text-lg lg:text-xl text-carbon uppercase tracking-tight">
-              {activeModel?.name || "—"}
-            </span>
-          </div>
+        <div className="flex items-center gap-3 lg:gap-5 bg-white/95 backdrop-blur-md border border-mineral/20 rounded-2xl px-4 lg:px-6 py-3 lg:py-4 shadow-xl">
           
+          {/* Voltage - INTERACTIVE */}
+          <Popover open={voltageOpen} onOpenChange={setVoltageOpen}>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-1.5 hover:bg-mineral/5 rounded-lg px-2 py-1 transition-colors group cursor-pointer">
+                <CircuitBoard className="w-4 h-4 lg:w-5 lg:h-5 text-amber-500" />
+                <div className="flex items-baseline gap-0.5">
+                  <AnimatedNumber 
+                    value={displayVoltage}
+                    className="font-display text-xl lg:text-2xl text-carbon"
+                  />
+                  <span className="text-xs text-muted-foreground font-medium">V</span>
+                </div>
+                <ChevronDown className="w-3 h-3 text-muted-foreground group-hover:text-carbon transition-colors" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-28 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={8}>
+              <Command>
+                <CommandList>
+                  {voltageOptions.map((v) => (
+                    <CommandItem
+                      key={v}
+                      onSelect={() => {
+                        setSelectedVoltage(v);
+                        setVoltageOpen(false);
+                      }}
+                      className={`cursor-pointer text-sm ${displayVoltage === v ? 'bg-mineral/10 font-semibold' : ''}`}
+                    >
+                      {v}V
+                    </CommandItem>
+                  ))}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+
           {/* Divider */}
-          <div className="h-6 lg:h-8 w-px bg-mineral/20" />
-          
-          {/* Power */}
+          <div className="h-8 w-px bg-mineral/20" />
+
+          {/* Amperage - INTERACTIVE */}
+          <Popover open={amperageOpen} onOpenChange={setAmperageOpen}>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-1.5 hover:bg-mineral/5 rounded-lg px-2 py-1 transition-colors group cursor-pointer">
+                <BatteryCharging className="w-4 h-4 lg:w-5 lg:h-5 text-green-500" />
+                <div className="flex items-baseline gap-0.5">
+                  <AnimatedNumber 
+                    value={displayAmperage}
+                    className="font-display text-xl lg:text-2xl text-carbon"
+                  />
+                  <span className="text-xs text-muted-foreground font-medium">Ah</span>
+                </div>
+                <ChevronDown className="w-3 h-3 text-muted-foreground group-hover:text-carbon transition-colors" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-28 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={8}>
+              <Command>
+                <CommandList>
+                  {amperageOptions.map((a) => (
+                    <CommandItem
+                      key={a}
+                      onSelect={() => {
+                        setSelectedAmperage(a);
+                        setAmperageOpen(false);
+                      }}
+                      className={`cursor-pointer text-sm ${displayAmperage === a ? 'bg-mineral/10 font-semibold' : ''}`}
+                    >
+                      {a}Ah
+                    </CommandItem>
+                  ))}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+
+          {/* Divider */}
+          <div className="h-8 w-px bg-mineral/20" />
+
+          {/* Wattage - FIXED (non-interactive) */}
           <div className="flex items-center gap-1.5">
-            <Zap className="w-4 h-4 lg:w-5 lg:h-5 text-mineral" />
+            <Zap className="w-4 h-4 lg:w-5 lg:h-5 text-yellow-500" />
             <div className="flex items-baseline gap-0.5">
               <AnimatedNumber 
-                value={activeModel ? parseSpecValue(activeModel.specs?.power || "0W") : 0}
+                value={displayWattage}
                 className="font-display text-xl lg:text-2xl text-carbon"
               />
               <span className="text-xs text-muted-foreground font-medium">W</span>
             </div>
           </div>
-          
+
           {/* Divider */}
-          <div className="h-6 lg:h-8 w-px bg-mineral/20" />
-          
-          {/* Speed */}
-          <div className="flex items-center gap-1.5">
-            <Battery className="w-4 h-4 lg:w-5 lg:h-5 text-mineral" />
-            <div className="flex items-baseline gap-0.5">
-              <AnimatedNumber 
-                value={activeModel ? parseSpecValue(activeModel.specs?.maxSpeed || "0km/h") : 0}
-                className="font-display text-xl lg:text-2xl text-carbon"
-              />
-              <span className="text-xs text-muted-foreground font-medium">km/h</span>
-            </div>
-          </div>
-          
-          {/* Divider */}
-          <div className="h-6 lg:h-8 w-px bg-mineral/20" />
-          
+          <div className="h-8 w-px bg-mineral/20" />
+
           {/* Counter */}
           <span className="text-sm text-muted-foreground font-medium">
             {currentIndex + 1} / {totalModels}

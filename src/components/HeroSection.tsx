@@ -31,6 +31,8 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
       brand: model.brand?.name || "",
       image: model.image_url || "/placeholder.svg",
       compatibleParts: model.compatible_parts_count || 0,
+      voltage: model.voltage || 36,
+      amperage: model.amperage || 12,
       specs: {
         power: `${model.power_watts || 0}W`,
         range: `${model.range_km || 0}km`,
