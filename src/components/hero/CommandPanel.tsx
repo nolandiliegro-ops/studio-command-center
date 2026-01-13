@@ -113,19 +113,6 @@ const CommandPanel = ({
             {activeModel.name}
           </motion.h3>
 
-          {/* Compatible Parts Badge */}
-          <motion.div
-            className="inline-flex items-center gap-1.5 lg:gap-2 px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full bg-white/70 border border-mineral/15 backdrop-blur-sm"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <span className="text-muted-foreground text-xs lg:text-sm">Pièces compatibles:</span>
-            <AnimatedNumber 
-              value={activeModel.compatibleParts} 
-              className="text-mineral font-bold text-base lg:text-lg"
-            />
-          </motion.div>
         </motion.div>
       )}
 
