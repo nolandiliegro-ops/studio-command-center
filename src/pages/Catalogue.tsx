@@ -253,14 +253,16 @@ const Catalogue = () => {
           )}
         </section>
 
-        {/* Category Bento Grid - Only parent categories */}
-        <section className="container mx-auto px-4 pb-4">
-          <CategoryBentoGrid
-            categories={parentCategories}
-            activeCategory={activeCategory}
-            onCategoryChange={handleCategoryChange}
-            isLoading={categoriesLoading}
-          />
+        {/* Category Bento Grid - Only parent categories - Centered */}
+        <section className="container mx-auto px-4 pb-4 flex justify-center">
+          <div className="w-full max-w-5xl">
+            <CategoryBentoGrid
+              categories={parentCategories}
+              activeCategory={activeCategory}
+              onCategoryChange={handleCategoryChange}
+              isLoading={categoriesLoading}
+            />
+          </div>
         </section>
 
         {/* Sub-Category Bar - Appears when parent has children */}

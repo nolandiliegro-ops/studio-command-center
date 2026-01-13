@@ -200,6 +200,36 @@
       hsl(var(--background));
   }
 
+  /* Hero Studio Background - Light Premium with Reflective Floor */
+  .hero-studio-bg {
+    background: 
+      /* Soft ambient light from top */
+      radial-gradient(ellipse 120% 50% at 50% -10%, hsl(0 0% 100% / 0.6) 0%, transparent 50%),
+      /* Main gradient - Light top, dark reflective floor bottom */
+      linear-gradient(
+        to bottom,
+        hsl(30 10% 98%) 0%,           /* Blanc cassé très léger */
+        hsl(30 10% 97%) 30%,          /* Transition douce */
+        hsl(30 8% 96%) 50%,           /* Gris très clair */
+        hsl(30 6% 94%) 65%,           /* Zone de transition */
+        hsl(0 0% 25% / 0.08) 80%,     /* Début du sol sombre */
+        hsl(0 0% 15% / 0.18) 100%     /* Sol réfléchissant sombre */
+      );
+  }
+
+  /* Reflective floor shine effect */
+  .hero-studio-bg::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 25%;
+    background: 
+      linear-gradient(to bottom, transparent 0%, hsl(0 0% 100% / 0.03) 40%, hsl(0 0% 0% / 0.06) 100%);
+    pointer-events: none;
+  }
+
   /* Enhanced reflective floor effect with horizontal shine line */
   .studio-floor-reflection {
     position: relative;

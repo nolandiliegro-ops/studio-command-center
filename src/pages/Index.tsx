@@ -1,10 +1,12 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
+import { ArrowDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import CompatiblePartsSection from "@/components/CompatiblePartsSection";
 import FavoritesSection from "@/components/home/FavoritesSection";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [activeModelSlug, setActiveModelSlug] = useState<string | null>(null);
@@ -15,14 +17,21 @@ const Index = () => {
     setActiveModelName(name);
   }, []);
 
+  const scrollToCompatibleParts = () => {
+    document.getElementById('compatible-parts')?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-greige">
+    <div className="min-h-screen bg-gradient-to-b from-[hsl(30_10%_97%)] via-[hsl(30_10%_96%)] to-[hsl(30_14%_95%)]">
       {/* Header - Fixed at top */}
       <Header />
       
       {/* Main Content - Vertical Layout */}
       <main className="pt-16 lg:pt-20">
-        {/* Hero Section - Full Width */}
+        {/* 1. Hero Section - Compact & Above the fold */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -31,21 +40,29 @@ const Index = () => {
           <HeroSection onActiveModelChange={handleActiveModelChange} />
         </motion.section>
 
-        {/* Favorites Section - Only visible when logged in */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
+        {/* 2. CTA Button - Centered under Hero */}
+        <motion.section 
+          className="py-6 lg:py-8 text-center"
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+          transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         >
-          <FavoritesSection />
+          <Button 
+            onClick={scrollToCompatibleParts}
+            className="rounded-full px-8 py-6 font-display text-base lg:text-lg tracking-wide gap-3 bg-carbon text-greige hover:bg-carbon/90 shadow-lg hover:shadow-xl transition-all"
+          >
+            DÉCOUVRIR LES PIÈCES
+            <ArrowDown className="w-5 h-5 animate-bounce" />
+          </Button>
         </motion.section>
 
-        {/* Compatible Parts Section - Below Hero */}
+        {/* 3. Compatible Parts Section */}
         <motion.section
-          className="py-12 lg:py-16"
+          id="compatible-parts"
+          className="py-8 lg:py-12 scroll-mt-20"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
         >
           <CompatiblePartsSection 
             activeModelSlug={activeModelSlug} 
@@ -53,21 +70,18 @@ const Index = () => {
           />
         </motion.section>
 
+        {/* 4. Favorites Section - Last, only visible when logged in */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+        >
+          <FavoritesSection />
+        </motion.section>
+
         {/* Footer */}
         <Footer />
       </main>
-
-      {/* Subtle ambient effects */}
-      <div className="fixed inset-0 pointer-events-none -z-10">
-        {/* Top subtle glow */}
-        <div 
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] opacity-10"
-          style={{
-            background: "radial-gradient(ellipse at center, rgba(147,181,161,0.2) 0%, transparent 70%)",
-            filter: "blur(40px)"
-          }}
-        />
-      </div>
 
       {/* Slogan - Refined badge */}
       <motion.div
