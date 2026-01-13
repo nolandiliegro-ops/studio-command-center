@@ -101,13 +101,13 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
   };
 
   return (
-    <section className="hero-studio-bg relative py-4 lg:py-6 flex flex-col overflow-hidden min-h-[480px] lg:min-h-[70vh] max-h-[85vh]">
+    <section className="hero-studio-bg relative py-2 lg:py-3 flex flex-col overflow-hidden min-h-[400px] lg:min-h-[55vh] max-h-[75vh]">
       <div className="container mx-auto px-4 lg:px-8 flex-1">
         {/* Strict 12-Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-center h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 items-center h-full">
           
-          {/* LEFT (col-span-3) - Slogan ROULE RÉPARE DURE */}
-          <div className="hidden lg:flex lg:order-1 lg:col-span-3">
+          {/* LEFT (col-span-3) - Slogan ROULE RÉPARE DURE - VISIBLE ON ALL SCREENS */}
+          <div className="order-3 lg:order-1 lg:col-span-3 flex justify-center lg:justify-start">
             <HeroBranding />
           </div>
 
@@ -143,11 +143,11 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
         </div>
       </div>
 
-      {/* CTA Button - Centered below the grid */}
-      <div className="flex justify-center py-4 lg:py-6">
+      {/* CTA Button - Centered below the grid - COMPACT */}
+      <div className="flex justify-center py-2 lg:py-3">
         <Button 
           onClick={scrollToCompatibleParts}
-          className="rounded-full px-8 py-6 font-display text-base lg:text-lg tracking-wide gap-3 bg-carbon text-greige hover:bg-carbon/90 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          className="rounded-full px-8 py-5 font-display text-base lg:text-lg tracking-wide gap-3 bg-carbon text-greige hover:bg-carbon/90 shadow-lg hover:shadow-xl transition-all hover:scale-105"
         >
           DÉCOUVRIR LES PIÈCES
           <ArrowDown className="w-5 h-5 animate-bounce" />
