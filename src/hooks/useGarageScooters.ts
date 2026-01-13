@@ -30,7 +30,7 @@ export const useGarageScooters = () => {
   const { user } = useAuthContext();
 
   const query = useQuery({
-    queryKey: ["user-garage", user?.id],
+    queryKey: ["user-garage-scooters", user?.id],
     queryFn: async () => {
       if (!user) return [];
 
