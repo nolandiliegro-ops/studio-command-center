@@ -200,32 +200,32 @@ const ScooterCarousel = ({
         </Button>
       </motion.div>
 
-      {/* Dashboard Specs Bar - Interactive with Voltage/Amperage selectors */}
+      {/* Dashboard Specs Bar - Compact, positioned to not overlap buttons */}
       <motion.div 
         key={`specs-bar-${activeModel?.id}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.4 }}
-        className="absolute bottom-[12%] lg:bottom-[14%] left-[42%] lg:left-[45%] -translate-x-1/2 z-30"
+        className="absolute bottom-[8%] lg:bottom-[10%] left-1/2 -translate-x-1/2 z-30"
       >
-        <div className="flex items-center gap-3 lg:gap-5 bg-white/95 backdrop-blur-md border border-mineral/20 rounded-2xl px-4 lg:px-6 py-3 lg:py-4 shadow-xl">
+        <div className="flex items-center gap-2 lg:gap-3 bg-white/95 backdrop-blur-md border border-mineral/20 rounded-xl px-3 lg:px-4 py-2 lg:py-2.5 shadow-lg">
           
           {/* Voltage - INTERACTIVE */}
           <Popover open={voltageOpen} onOpenChange={setVoltageOpen}>
             <PopoverTrigger asChild>
-              <button className="flex items-center gap-1.5 hover:bg-mineral/5 rounded-lg px-2 py-1 transition-colors group cursor-pointer">
-                <CircuitBoard className="w-4 h-4 lg:w-5 lg:h-5 text-amber-500" />
+              <button className="flex items-center gap-1 hover:bg-mineral/5 rounded-md px-1.5 py-0.5 transition-colors group cursor-pointer">
+                <CircuitBoard className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-amber-500" />
                 <div className="flex items-baseline gap-0.5">
                   <AnimatedNumber 
                     value={displayVoltage}
-                    className="font-display text-xl lg:text-2xl text-carbon"
+                    className="font-display text-base lg:text-lg text-carbon"
                   />
-                  <span className="text-xs text-muted-foreground font-medium">V</span>
+                  <span className="text-[10px] text-muted-foreground font-medium">V</span>
                 </div>
-                <ChevronDown className="w-3 h-3 text-muted-foreground group-hover:text-carbon transition-colors" />
+                <ChevronDown className="w-2.5 h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
               </button>
             </PopoverTrigger>
-          <PopoverContent className="w-28 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={8}>
+          <PopoverContent className="w-24 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={8}>
             <Command>
               <CommandList>
                 {availableVoltages.map((v) => (
@@ -246,24 +246,24 @@ const ScooterCarousel = ({
         </Popover>
 
         {/* Divider */}
-        <div className="h-8 w-px bg-mineral/20" />
+        <div className="h-5 w-px bg-mineral/20" />
 
         {/* Amperage - INTERACTIVE with dynamic filtering */}
         <Popover open={amperageOpen} onOpenChange={setAmperageOpen}>
           <PopoverTrigger asChild>
-            <button className="flex items-center gap-1.5 hover:bg-mineral/5 rounded-lg px-2 py-1 transition-colors group cursor-pointer">
-              <BatteryCharging className="w-4 h-4 lg:w-5 lg:h-5 text-green-500" />
+            <button className="flex items-center gap-1 hover:bg-mineral/5 rounded-md px-1.5 py-0.5 transition-colors group cursor-pointer">
+              <BatteryCharging className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-green-500" />
               <div className="flex items-baseline gap-0.5">
                 <AnimatedNumber 
                   value={displayAmperage}
-                  className="font-display text-xl lg:text-2xl text-carbon"
+                  className="font-display text-base lg:text-lg text-carbon"
                 />
-                <span className="text-xs text-muted-foreground font-medium">Ah</span>
+                <span className="text-[10px] text-muted-foreground font-medium">Ah</span>
               </div>
-              <ChevronDown className="w-3 h-3 text-muted-foreground group-hover:text-carbon transition-colors" />
+              <ChevronDown className="w-2.5 h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-28 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={8}>
+          <PopoverContent className="w-24 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={8}>
             <Command>
               <CommandList>
                 {availableAmperages.map((a) => (
@@ -284,27 +284,19 @@ const ScooterCarousel = ({
         </Popover>
 
           {/* Divider */}
-          <div className="h-8 w-px bg-mineral/20" />
+          <div className="h-5 w-px bg-mineral/20" />
 
           {/* Wattage - FIXED (non-interactive) */}
-          <div className="flex items-center gap-1.5">
-            <Zap className="w-4 h-4 lg:w-5 lg:h-5 text-yellow-500" />
+          <div className="flex items-center gap-1">
+            <Zap className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-yellow-500" />
             <div className="flex items-baseline gap-0.5">
               <AnimatedNumber 
                 value={displayWattage}
-                className="font-display text-xl lg:text-2xl text-carbon"
+                className="font-display text-base lg:text-lg text-carbon"
               />
-              <span className="text-xs text-muted-foreground font-medium">W</span>
+              <span className="text-[10px] text-muted-foreground font-medium">W</span>
             </div>
           </div>
-
-          {/* Divider */}
-          <div className="h-8 w-px bg-mineral/20" />
-
-          {/* Counter */}
-          <span className="text-sm text-muted-foreground font-medium">
-            {currentIndex + 1} / {totalModels}
-          </span>
         </div>
       </motion.div>
 
