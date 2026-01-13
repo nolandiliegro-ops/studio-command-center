@@ -13,12 +13,18 @@ export interface ScooterModel {
   brand: string;
   image: string;
   compatibleParts: number;
+  voltage?: number;
+  amperage?: number;
   specs: {
     power: string;
     range: string;
     maxSpeed: string;
   };
 }
+
+// Options disponibles pour les sélecteurs interactifs
+export const voltageOptions = [36, 48, 52, 60, 72];
+export const amperageOptions = [7, 10, 12, 15, 18, 20, 24, 30, 35, 40];
 
 export interface Category {
   id: string;
