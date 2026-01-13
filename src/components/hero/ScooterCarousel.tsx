@@ -328,7 +328,7 @@ const ScooterCarousel = ({
           {/* Glow Effect */}
           <span className="absolute inset-0 rounded-full bg-gradient-to-r from-mineral/20 to-garage/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity" />
           
-          <span className="relative z-10">DÉCOUVRIR LES PIÈCES</span>
+          <span className="relative z-10">DÉCOUVRIR LES {activeModel?.compatibleParts || 0} PIÈCES</span>
           <ChevronDown className="relative z-10 w-4 h-4 lg:w-6 lg:h-6 animate-bounce" />
         </button>
       </motion.div>
@@ -340,8 +340,8 @@ const ScooterCarousel = ({
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        {/* Navigation Dots - Smaller on mobile, show max 5 on mobile, 7 on desktop */}
-        <div className="flex items-center gap-1.5 lg:gap-3">
+        {/* Navigation Dots - Massive for better UX */}
+        <div className="flex items-center gap-2 lg:gap-4">
           {Array.from({ length: Math.min(5, models.length) }).map((_, index) => (
             <button
               key={index}
@@ -349,23 +349,23 @@ const ScooterCarousel = ({
               className={cn(
                 "rounded-full transition-all duration-300",
                 index === activeIndex
-                  ? "w-5 lg:w-10 h-2 lg:h-4 bg-mineral"
-                  : "w-2 h-2 lg:w-4 lg:h-4 bg-mineral/30 hover:bg-mineral/50"
+                  ? "w-6 lg:w-14 h-3 lg:h-5 bg-mineral"
+                  : "w-3 h-3 lg:w-6 lg:h-6 bg-mineral/30 hover:bg-mineral/50"
               )}
             />
           ))}
         </div>
         
-        {/* Dynamic Counter */}
+        {/* Dynamic Counter - Massive */}
         {models.length > 5 && (
-          <span className="text-sm lg:text-xl font-bold text-carbon ml-1">
+          <span className="text-lg lg:text-3xl font-black text-carbon ml-2">
             +{models.length - 5}
           </span>
         )}
 
-        {/* Total Badge - Smaller on mobile */}
-        <div className="ml-2 lg:ml-3 px-2 lg:px-4 py-1 lg:py-2 rounded-full bg-mineral/15 border border-mineral/25 backdrop-blur-sm">
-          <span className="text-xs lg:text-base font-bold text-mineral">
+        {/* Total Badge - Larger */}
+        <div className="ml-3 lg:ml-4 px-3 lg:px-6 py-1.5 lg:py-3 rounded-full bg-mineral/15 border border-mineral/25 backdrop-blur-sm">
+          <span className="text-sm lg:text-xl font-bold text-mineral">
             {models.length} modèle{models.length > 1 ? 's' : ''}
           </span>
         </div>
