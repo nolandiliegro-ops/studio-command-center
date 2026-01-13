@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
 
 const HeroBranding = () => {
   return (
@@ -55,17 +53,6 @@ const HeroBranding = () => {
         Trouvez les pièces détachées compatibles avec votre trottinette électrique. 
         Plus de 2000 références disponibles.
       </p>
-
-      {/* CTA Button - General catalogue */}
-      <div className="mt-4 lg:mt-5 animate-fade-in" style={{ animationDelay: "0.5s" }}>
-        <Button 
-          size="lg" 
-          className="rounded-full px-6 py-5 font-display text-lg tracking-wide gap-2 hover:scale-105 transition-transform"
-        >
-          <Sparkles className="w-5 h-5" />
-          Découvrir les pièces
-        </Button>
-      </div>
     </div>
   );
 };
