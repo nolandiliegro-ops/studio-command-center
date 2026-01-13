@@ -63,82 +63,12 @@ const CommandPanel = ({
   };
 
   return (
-    <div className="flex flex-col justify-start h-full space-y-5">
-      {/* Section Title */}
-      <div className="animate-fade-in">
-        <p className="text-sm tracking-[0.2em] text-muted-foreground font-medium mb-2">
-          ÉTAPE 1
-        </p>
-        <h2 className="font-display text-xl lg:text-2xl text-foreground">
-          Identifiez votre trottinette
-        </h2>
-      </div>
-
-      {/* Search Bar with Dropdown */}
-      <div 
-        ref={searchContainerRef}
-        className="relative animate-fade-in" 
-        style={{ animationDelay: "0.1s" }}
-      >
-        <div className="glass rounded-2xl p-1">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Modèle, marque..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
-              className="pl-12 pr-4 py-5 text-base bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
-            />
-          </div>
-        </div>
-        
-        {/* Predictive Search Dropdown */}
-        <SearchDropdown
-          results={searchResults}
-          isVisible={showDropdown}
-          isLoading={isLoading}
-          onSelect={handleModelSelect}
-        />
-      </div>
-
-      {/* Brand Selection */}
-      <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-        <p className="text-sm text-muted-foreground mb-2">Ou sélectionnez une marque</p>
-        <div className="flex flex-wrap gap-2">
-          {/* All Brands Option */}
-          <button
-            onClick={() => onBrandSelect(null)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-              selectedBrand === null
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            Toutes
-          </button>
-          {brands.map((brand) => (
-            <button
-              key={brand.id}
-              onClick={() => onBrandSelect(brand.id)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                selectedBrand === brand.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              {brand.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Active Model Info - Moved from carousel */}
+    <div className="flex flex-col justify-start h-full space-y-4">
+      {/* FIRST: Active Model Info - Priority placement */}
       {activeModel && (
         <motion.div 
           key={activeModel.id}
-          className="animate-fade-in pt-4 border-t border-mineral/10"
+          className="animate-fade-in"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -180,15 +110,15 @@ const CommandPanel = ({
           </motion.div>
 
           {/* Navigation Arrows */}
-          <div className="flex items-center gap-3 mt-4">
+          <div className="flex items-center gap-3 mt-3">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={onNavigatePrev}
-                className="rounded-full w-10 h-10 bg-white/80 border-mineral/20 hover:border-mineral/40 hover:bg-white backdrop-blur-sm transition-all"
+                className="rounded-full w-9 h-9 bg-white/80 border-mineral/20 hover:border-mineral/40 hover:bg-white backdrop-blur-sm transition-all"
               >
-                <ChevronLeft className="w-5 h-5 text-carbon" />
+                <ChevronLeft className="w-4 h-4 text-carbon" />
               </Button>
             </motion.div>
 
@@ -197,9 +127,9 @@ const CommandPanel = ({
                 variant="outline"
                 size="icon"
                 onClick={onNavigateNext}
-                className="rounded-full w-10 h-10 bg-white/80 border-mineral/20 hover:border-mineral/40 hover:bg-white backdrop-blur-sm transition-all"
+                className="rounded-full w-9 h-9 bg-white/80 border-mineral/20 hover:border-mineral/40 hover:bg-white backdrop-blur-sm transition-all"
               >
-                <ChevronRight className="w-5 h-5 text-carbon" />
+                <ChevronRight className="w-4 h-4 text-carbon" />
               </Button>
             </motion.div>
 
@@ -211,11 +141,84 @@ const CommandPanel = ({
         </motion.div>
       )}
 
+      {/* Separator */}
+      <div className="border-t border-mineral/10" />
+
+      {/* Section Title */}
+      <div className="animate-fade-in">
+        <p className="text-xs tracking-[0.2em] text-muted-foreground font-medium mb-1">
+          RECHERCHER
+        </p>
+        <h2 className="font-display text-lg lg:text-xl text-foreground">
+          Identifiez votre trottinette
+        </h2>
+      </div>
+
+      {/* Search Bar with Dropdown */}
+      <div 
+        ref={searchContainerRef}
+        className="relative animate-fade-in" 
+        style={{ animationDelay: "0.1s" }}
+      >
+        <div className="glass rounded-2xl p-1">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Modèle, marque..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              onFocus={() => searchQuery.length >= 2 && setShowDropdown(true)}
+              className="pl-12 pr-4 py-4 text-base bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
+            />
+          </div>
+        </div>
+        
+        {/* Predictive Search Dropdown */}
+        <SearchDropdown
+          results={searchResults}
+          isVisible={showDropdown}
+          isLoading={isLoading}
+          onSelect={handleModelSelect}
+        />
+      </div>
+
+      {/* Brand Selection */}
+      <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
+        <p className="text-xs text-muted-foreground mb-2">Ou sélectionnez une marque</p>
+        <div className="flex flex-wrap gap-1.5">
+          {/* All Brands Option */}
+          <button
+            onClick={() => onBrandSelect(null)}
+            className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
+              selectedBrand === null
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            Toutes
+          </button>
+          {brands.map((brand) => (
+            <button
+              key={brand.id}
+              onClick={() => onBrandSelect(brand.id)}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
+                selectedBrand === brand.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              {brand.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Quick Access - Compact */}
-      <div className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
-        <div className="flex items-center gap-2 mb-3">
-          <Star className="w-4 h-4 text-primary fill-primary" />
-          <p className="text-sm tracking-[0.15em] text-muted-foreground font-medium">
+      <div className="animate-fade-in pt-2" style={{ animationDelay: "0.3s" }}>
+        <div className="flex items-center gap-2 mb-2">
+          <Star className="w-3 h-3 text-primary fill-primary" />
+          <p className="text-xs tracking-[0.15em] text-muted-foreground font-medium">
             ACCÈS RAPIDE
           </p>
         </div>
@@ -223,24 +226,19 @@ const CommandPanel = ({
         <div className="flex flex-wrap items-center gap-2">
           {/* Scanner Button */}
           <Button
-            className="rounded-full px-5 py-4 font-display text-base tracking-wide gap-2 pulse-glow rotate-[-2deg] hover:rotate-0 transition-transform"
+            size="sm"
+            className="rounded-full px-4 py-3 font-display text-sm tracking-wide gap-2 pulse-glow rotate-[-2deg] hover:rotate-0 transition-transform"
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-3 h-3" />
             Scanner
           </Button>
 
-          {/* Decorative Star */}
-          <div className="text-primary hidden lg:block">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0L13.5 10.5L24 12L13.5 13.5L12 24L10.5 13.5L0 12L10.5 10.5L12 0Z" />
-            </svg>
-          </div>
-
           {/* Mon Garage Button */}
           <Button
-            className="rounded-full px-5 py-4 font-display text-base tracking-wide gap-2 bg-garage text-garage-foreground hover:bg-garage/90 rotate-[2deg] hover:rotate-0 transition-all"
+            size="sm"
+            className="rounded-full px-4 py-3 font-display text-sm tracking-wide gap-2 bg-garage text-garage-foreground hover:bg-garage/90 rotate-[2deg] hover:rotate-0 transition-all"
           >
-            <Home className="w-4 h-4" />
+            <Home className="w-3 h-3" />
             Mon Garage
           </Button>
         </div>

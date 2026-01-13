@@ -217,13 +217,13 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
                           </div>
                         </motion.div>
 
-                        {/* Range Badge - Bottom Center */}
+                        {/* Range Badge - Above reflection, not at bottom */}
                         <motion.div
                           key={`range-${model.id}`}
                           initial={{ opacity: 0, scale: 0 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-                          className="absolute left-1/2 -translate-x-1/2 bottom-4 bg-white/90 backdrop-blur-sm border border-mineral/20 rounded-xl px-3 py-2 shadow-lg z-10"
+                          className="absolute left-1/2 -translate-x-1/2 bottom-[30%] bg-white/90 backdrop-blur-sm border border-mineral/20 rounded-xl px-3 py-2 shadow-lg z-10"
                         >
                           <div className="flex items-center gap-1.5">
                             <Battery className="w-4 h-4 text-mineral" />

@@ -1,12 +1,10 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ArrowDown } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import CompatiblePartsSection from "@/components/CompatiblePartsSection";
 import FavoritesSection from "@/components/home/FavoritesSection";
-import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [activeModelSlug, setActiveModelSlug] = useState<string | null>(null);
@@ -40,23 +38,7 @@ const Index = () => {
           <HeroSection onActiveModelChange={handleActiveModelChange} />
         </motion.section>
 
-        {/* 2. CTA Button - Centered under Hero */}
-        <motion.section 
-          className="py-6 lg:py-8 text-center"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-        >
-          <Button 
-            onClick={scrollToCompatibleParts}
-            className="rounded-full px-8 py-6 font-display text-base lg:text-lg tracking-wide gap-3 bg-carbon text-greige hover:bg-carbon/90 shadow-lg hover:shadow-xl transition-all"
-          >
-            DÉCOUVRIR LES PIÈCES
-            <ArrowDown className="w-5 h-5 animate-bounce" />
-          </Button>
-        </motion.section>
-
-        {/* 3. Compatible Parts Section */}
+        {/* 2. Compatible Parts Section */}
         <motion.section
           id="compatible-parts"
           className="py-8 lg:py-12 scroll-mt-20"

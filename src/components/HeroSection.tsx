@@ -1,4 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
+import { ArrowDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import HeroBranding from "./hero/HeroBranding";
 import ScooterCarousel from "./hero/ScooterCarousel";
 import ScooterCarouselSkeleton from "./hero/ScooterCarouselSkeleton";
@@ -91,14 +93,21 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
     }
   };
 
+  const scrollToCompatibleParts = () => {
+    document.getElementById('compatible-parts')?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
+
   return (
-    <section className="hero-studio-bg relative py-4 lg:py-6 flex items-center overflow-hidden min-h-[480px] lg:min-h-[70vh] max-h-[80vh]">
-      <div className="container mx-auto px-4 lg:px-8 h-full">
+    <section className="hero-studio-bg relative py-4 lg:py-6 flex flex-col overflow-hidden min-h-[480px] lg:min-h-[70vh] max-h-[85vh]">
+      <div className="container mx-auto px-4 lg:px-8 flex-1">
         {/* Strict 12-Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-center h-full">
           
           {/* LEFT (col-span-3) - Slogan ROULE RÉPARE DURE */}
-          <div className="order-2 lg:order-1 lg:col-span-3">
+          <div className="hidden lg:flex lg:order-1 lg:col-span-3">
             <HeroBranding />
           </div>
 
@@ -115,8 +124,8 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
             )}
           </div>
 
-          {/* RIGHT (col-span-3) - Search + Brands + Model Info */}
-          <div className="order-3 lg:col-span-3">
+          {/* RIGHT (col-span-3) - Model Info FIRST + Search + Brands */}
+          <div className="order-2 lg:order-3 lg:col-span-3">
             <CommandPanel
               brands={transformedBrands}
               selectedBrand={selectedBrand}
@@ -132,6 +141,17 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
             />
           </div>
         </div>
+      </div>
+
+      {/* CTA Button - Centered below the grid */}
+      <div className="flex justify-center py-4 lg:py-6">
+        <Button 
+          onClick={scrollToCompatibleParts}
+          className="rounded-full px-8 py-6 font-display text-base lg:text-lg tracking-wide gap-3 bg-carbon text-greige hover:bg-carbon/90 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+        >
+          DÉCOUVRIR LES PIÈCES
+          <ArrowDown className="w-5 h-5 animate-bounce" />
+        </Button>
       </div>
     </section>
   );
