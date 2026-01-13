@@ -94,18 +94,31 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
   };
 
   return (
-    <section className="hero-studio-bg relative py-4 lg:py-6 flex flex-col overflow-hidden min-h-[480px] lg:min-h-[70vh] max-h-[85vh]">
+    <section className="hero-studio-bg relative py-4 lg:py-6 flex flex-col overflow-hidden min-h-[auto] lg:min-h-[70vh] lg:max-h-[85vh]">
       <div className="container mx-auto px-4 lg:px-8 flex-1">
-        {/* Strict 12-Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-center h-full">
+        {/* Mobile: Flex Column | Desktop: 12-Column Grid */}
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-6 lg:items-center h-full">
           
-          {/* LEFT (col-span-3) - Slogan ROULE RÉPARE DURE */}
+          {/* LEFT (col-span-3) - Slogan ROULE RÉPARE DURE - Desktop only */}
           <div className="hidden lg:flex lg:order-1 lg:col-span-3">
             <HeroBranding />
           </div>
 
-          {/* CENTER (col-span-6) - Scooter ONLY with navigation arrows flanking */}
-          <div className="order-1 lg:order-2 lg:col-span-6 h-full flex items-center justify-center">
+          {/* MOBILE ORDER 1: Model Info (Name, Brand, Parts count) */}
+          <div className="order-1 lg:order-3 lg:col-span-3">
+            <CommandPanel
+              brands={transformedBrands}
+              selectedBrand={selectedBrand}
+              onBrandSelect={handleBrandSelect}
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+              onModelSelect={handleModelSelect}
+              activeModel={activeModel}
+            />
+          </div>
+
+          {/* MOBILE ORDER 2: Scooter Carousel (Image, Specs, Dots, Bridge) */}
+          <div className="order-2 lg:order-2 lg:col-span-6 flex items-center justify-center">
             {isLoading ? (
               <ScooterCarouselSkeleton />
             ) : (
@@ -119,19 +132,6 @@ const HeroSection = ({ onActiveModelChange }: HeroSectionProps) => {
                 currentIndex={activeIndex}
               />
             )}
-          </div>
-
-          {/* RIGHT (col-span-3) - Model Info FIRST + Search + Brands (no arrows here) */}
-          <div className="order-2 lg:order-3 lg:col-span-3">
-            <CommandPanel
-              brands={transformedBrands}
-              selectedBrand={selectedBrand}
-              onBrandSelect={handleBrandSelect}
-              searchQuery={searchQuery}
-              onSearchChange={handleSearchChange}
-              onModelSelect={handleModelSelect}
-              activeModel={activeModel}
-            />
           </div>
         </div>
       </div>

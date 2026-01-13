@@ -142,7 +142,7 @@ const ScooterCarousel = ({
   }
 
   return (
-    <div className="relative flex items-center justify-center h-full w-full">
+    <div className="relative flex flex-col lg:flex-row items-center justify-center w-full">
       {/* Background Text Effect - TROTTINETTE - Hidden on mobile */}
       <div className="absolute inset-0 hidden lg:flex items-center justify-center pointer-events-none overflow-hidden select-none">
         <span 
@@ -201,31 +201,31 @@ const ScooterCarousel = ({
         </Button>
       </motion.div>
 
-      {/* FLOATING SPECS - Décalé vers la gauche */}
+      {/* FLOATING SPECS - Centered below image on mobile, positioned on desktop */}
       <motion.div 
         key={`specs-floating-${activeModel?.id}`}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.4 }}
-        className="absolute top-[30%] lg:top-[26%] left-[50%] lg:left-[52%] -translate-y-1/2 z-30"
+        className="relative lg:absolute mt-2 lg:mt-0 lg:top-[26%] lg:left-[52%] lg:-translate-y-1/2 z-30 order-3 lg:order-none"
       >
-        <div className="flex items-center gap-2 lg:gap-2.5 px-2.5 lg:px-3.5 py-2 lg:py-2.5 
+        <div className="flex items-center justify-center gap-1.5 lg:gap-2.5 px-2 lg:px-3.5 py-1.5 lg:py-2.5 
                         bg-white/90 backdrop-blur-md rounded-lg border border-mineral/15 
                         shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
           
           {/* Voltage avec label */}
           <Popover open={voltageOpen} onOpenChange={setVoltageOpen}>
             <PopoverTrigger asChild>
-              <button className="flex flex-col items-center gap-0.5 hover:bg-mineral/5 rounded px-2 py-1 transition-colors group cursor-pointer">
-                <span className="text-[8px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Volt</span>
+              <button className="flex flex-col items-center gap-0.5 hover:bg-mineral/5 rounded px-1.5 lg:px-2 py-0.5 lg:py-1 transition-colors group cursor-pointer">
+                <span className="text-[7px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Volt</span>
                 <div className="flex items-center gap-0.5">
-                  <CircuitBoard className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-amber-500" />
+                  <CircuitBoard className="w-3 h-3 lg:w-4 lg:h-4 text-amber-500" />
                   <AnimatedNumber 
                     value={displayVoltage}
-                    className="font-display text-base lg:text-lg text-carbon"
+                    className="font-display text-sm lg:text-lg text-carbon"
                   />
-                  <span className="text-[9px] text-muted-foreground font-medium">V</span>
-                  <ChevronDown className="w-2.5 h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
+                  <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">V</span>
+                  <ChevronDown className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
                 </div>
               </button>
             </PopoverTrigger>
@@ -250,21 +250,21 @@ const ScooterCarousel = ({
           </Popover>
 
           {/* Divider */}
-          <div className="h-7 w-px bg-mineral/20" />
+          <div className="h-5 lg:h-7 w-px bg-mineral/20" />
 
           {/* Amperage avec label */}
           <Popover open={amperageOpen} onOpenChange={setAmperageOpen}>
             <PopoverTrigger asChild>
-              <button className="flex flex-col items-center gap-0.5 hover:bg-mineral/5 rounded px-2 py-1 transition-colors group cursor-pointer">
-                <span className="text-[8px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Ah</span>
+              <button className="flex flex-col items-center gap-0.5 hover:bg-mineral/5 rounded px-1.5 lg:px-2 py-0.5 lg:py-1 transition-colors group cursor-pointer">
+                <span className="text-[7px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Ah</span>
                 <div className="flex items-center gap-0.5">
-                  <BatteryCharging className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-green-500" />
+                  <BatteryCharging className="w-3 h-3 lg:w-4 lg:h-4 text-green-500" />
                   <AnimatedNumber 
                     value={displayAmperage}
-                    className="font-display text-base lg:text-lg text-carbon"
+                    className="font-display text-sm lg:text-lg text-carbon"
                   />
-                  <span className="text-[9px] text-muted-foreground font-medium">Ah</span>
-                  <ChevronDown className="w-2.5 h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
+                  <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">Ah</span>
+                  <ChevronDown className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
                 </div>
               </button>
             </PopoverTrigger>
@@ -289,36 +289,36 @@ const ScooterCarousel = ({
           </Popover>
 
           {/* Divider */}
-          <div className="h-7 w-px bg-mineral/20" />
+          <div className="h-5 lg:h-7 w-px bg-mineral/20" />
 
           {/* Wattage avec label */}
-          <div className="flex flex-col items-center gap-0.5 px-2 py-1">
-            <span className="text-[8px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Watt</span>
+          <div className="flex flex-col items-center gap-0.5 px-1.5 lg:px-2 py-0.5 lg:py-1">
+            <span className="text-[7px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Watt</span>
             <div className="flex items-center gap-0.5">
-              <Zap className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-yellow-500" />
+              <Zap className="w-3 h-3 lg:w-4 lg:h-4 text-yellow-500" />
               <AnimatedNumber 
                 value={displayWattage}
-                className="font-display text-base lg:text-lg text-carbon"
+                className="font-display text-sm lg:text-lg text-carbon"
               />
-              <span className="text-[9px] text-muted-foreground font-medium">W</span>
+              <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">W</span>
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* BRIDGE BUTTON - Position de l'ancienne barre de specs (bas centre) */}
+      {/* BRIDGE BUTTON - Relative on mobile, absolute on desktop */}
       <motion.div 
-        className="absolute bottom-[12%] lg:bottom-[14%] left-1/2 -translate-x-1/2 z-40"
+        className="relative lg:absolute mt-3 lg:mt-0 lg:bottom-[14%] lg:left-1/2 lg:-translate-x-1/2 z-40 order-5 lg:order-none flex justify-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.4 }}
       >
         <button
           onClick={() => document.getElementById('compatible-parts')?.scrollIntoView({ behavior: 'smooth' })}
-          className="group relative flex items-center gap-3 lg:gap-4 
-                     px-8 py-4 lg:px-10 lg:py-5 
+          className="group relative flex items-center gap-2 lg:gap-4 
+                     px-5 py-3 lg:px-10 lg:py-5 
                      bg-carbon text-greige 
-                     font-display text-base lg:text-xl tracking-wide
+                     font-display text-sm lg:text-xl tracking-wide
                      rounded-full border border-white/10
                      shadow-[0_8px_32px_rgba(28,28,28,0.4)]
                      hover:shadow-[0_12px_48px_rgba(28,28,28,0.6)]
@@ -329,43 +329,43 @@ const ScooterCarousel = ({
           <span className="absolute inset-0 rounded-full bg-gradient-to-r from-mineral/20 to-garage/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity" />
           
           <span className="relative z-10">DÉCOUVRIR LES PIÈCES</span>
-          <ChevronDown className="relative z-10 w-5 h-5 lg:w-6 lg:h-6 animate-bounce" />
+          <ChevronDown className="relative z-10 w-4 h-4 lg:w-6 lg:h-6 animate-bounce" />
         </button>
       </motion.div>
 
-      {/* Pagination Dots - PLUS IMPOSANTS avec Dynamic Counter */}
+      {/* Pagination Dots - Relative on mobile, absolute on desktop */}
       <motion.div 
-        className="absolute bottom-[2%] lg:bottom-[3%] left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 lg:gap-4"
+        className="relative lg:absolute mt-2 lg:mt-0 lg:bottom-[3%] lg:left-1/2 lg:-translate-x-1/2 z-20 flex items-center justify-center gap-2 lg:gap-4 order-4 lg:order-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        {/* Navigation Dots - BIGGER - Show max 7 dots */}
-        <div className="flex items-center gap-2 lg:gap-3">
-          {Array.from({ length: Math.min(7, models.length) }).map((_, index) => (
+        {/* Navigation Dots - Smaller on mobile, show max 5 on mobile, 7 on desktop */}
+        <div className="flex items-center gap-1.5 lg:gap-3">
+          {Array.from({ length: Math.min(5, models.length) }).map((_, index) => (
             <button
               key={index}
               onClick={() => onSelect(index)}
               className={cn(
                 "rounded-full transition-all duration-300",
                 index === activeIndex
-                  ? "w-8 lg:w-10 h-3 lg:h-4 bg-mineral"
-                  : "w-3 h-3 lg:w-4 lg:h-4 bg-mineral/30 hover:bg-mineral/50"
+                  ? "w-5 lg:w-10 h-2 lg:h-4 bg-mineral"
+                  : "w-2 h-2 lg:w-4 lg:h-4 bg-mineral/30 hover:bg-mineral/50"
               )}
             />
           ))}
         </div>
         
-        {/* Dynamic Counter - BIGGER & BOLDER */}
-        {models.length > 7 && (
-          <span className="text-lg lg:text-xl font-bold text-carbon ml-1">
-            +{models.length - 7}
+        {/* Dynamic Counter */}
+        {models.length > 5 && (
+          <span className="text-sm lg:text-xl font-bold text-carbon ml-1">
+            +{models.length - 5}
           </span>
         )}
 
-        {/* Total Badge - More Prominent */}
-        <div className="ml-3 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full bg-mineral/15 border border-mineral/25 backdrop-blur-sm">
-          <span className="text-sm lg:text-base font-bold text-mineral">
+        {/* Total Badge - Smaller on mobile */}
+        <div className="ml-2 lg:ml-3 px-2 lg:px-4 py-1 lg:py-2 rounded-full bg-mineral/15 border border-mineral/25 backdrop-blur-sm">
+          <span className="text-xs lg:text-base font-bold text-mineral">
             {models.length} modèle{models.length > 1 ? 's' : ''}
           </span>
         </div>
@@ -379,9 +379,9 @@ const ScooterCarousel = ({
       </div>
 
       {/* Main Layout: Carousel */}
-      <div className="relative flex items-center justify-center w-full h-full px-16 lg:px-20">
-        {/* Carousel Container - BIGGER scooter */}
-        <div className="relative w-full max-w-5xl overflow-hidden" ref={emblaRef}>
+      <div className="relative flex items-center justify-center w-full px-4 lg:px-20 order-2 lg:order-none">
+        {/* Carousel Container */}
+        <div className="relative w-full max-w-[320px] lg:max-w-5xl overflow-hidden" ref={emblaRef}>
           <div className="flex items-center">
             {models.map((model, index) => {
               const isActive = index === activeIndex;
@@ -395,15 +395,15 @@ const ScooterCarousel = ({
               return (
                 <div
                   key={model.id}
-                  className="flex-shrink-0 w-full flex items-center justify-center px-4"
+                  className="flex-shrink-0 w-full flex items-center justify-center px-2 lg:px-4"
                   style={{
                     transform: `scale(${scale})`,
                     opacity,
                     transition: "transform 0.5s ease-out, opacity 0.5s ease-out",
                   }}
                 >
-                  {/* MASSIVE Scooter Container - Maximum Showroom Impact */}
-                  <div className="relative w-full max-w-[800px] lg:max-w-[950px] mx-auto h-[560px] lg:h-[680px] xl:h-[750px] flex items-center justify-center">
+                  {/* Scooter Container - Constrained height on mobile */}
+                  <div className="relative w-full max-w-[280px] lg:max-w-[950px] mx-auto h-[280px] lg:h-[680px] xl:h-[750px] flex items-center justify-center">
                     {/* Favorite & Garage Buttons */}
                     <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
                       <FavoriteButton

@@ -81,31 +81,31 @@ const CommandPanel = ({
   const activeBrandColors = getBrandColorClasses(activeModel?.brandId);
 
   return (
-    <div className="flex flex-col justify-start h-full space-y-4">
+    <div className="flex flex-col justify-start h-full space-y-3 lg:space-y-4">
       {/* FIRST: Active Model Info - Priority placement */}
       {activeModel && (
         <motion.div 
           key={activeModel.id}
-          className="animate-fade-in"
+          className="animate-fade-in text-center lg:text-left"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
           {/* Brand Badge with Dynamic Color */}
           <motion.div
-            className={`inline-block px-3 py-1.5 rounded-full ${activeBrandColors.bg} ${activeBrandColors.text} backdrop-blur-sm mb-2 shadow-sm`}
+            className={`inline-block px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full ${activeBrandColors.bg} ${activeBrandColors.text} backdrop-blur-sm mb-2 shadow-sm`}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
           >
-            <p className="text-xs font-bold tracking-wide uppercase">
+            <p className="text-[10px] lg:text-xs font-bold tracking-wide uppercase">
               {activeModel.brand}
             </p>
           </motion.div>
 
-          {/* Model Name - MASSIVE Showroom Typography */}
+          {/* Model Name - Reduced on mobile */}
           <motion.h3 
-            className="font-display text-4xl lg:text-5xl xl:text-6xl text-carbon mb-3 tracking-tighter leading-none uppercase"
+            className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-carbon mb-2 lg:mb-3 tracking-tighter leading-none uppercase"
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
@@ -115,25 +115,25 @@ const CommandPanel = ({
 
           {/* Compatible Parts Badge */}
           <motion.div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/70 border border-mineral/15 backdrop-blur-sm"
+            className="inline-flex items-center gap-1.5 lg:gap-2 px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full bg-white/70 border border-mineral/15 backdrop-blur-sm"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <span className="text-muted-foreground text-sm">Pièces compatibles:</span>
+            <span className="text-muted-foreground text-xs lg:text-sm">Pièces compatibles:</span>
             <AnimatedNumber 
               value={activeModel.compatibleParts} 
-              className="text-mineral font-bold text-lg"
+              className="text-mineral font-bold text-base lg:text-lg"
             />
           </motion.div>
         </motion.div>
       )}
 
-      {/* Separator */}
-      <div className="border-t border-mineral/10" />
+      {/* Separator - Hidden on mobile for cleaner look */}
+      <div className="hidden lg:block border-t border-mineral/10" />
 
-      {/* Section Title */}
-      <div className="animate-fade-in">
+      {/* Section Title - Hidden on mobile */}
+      <div className="hidden lg:block animate-fade-in">
         <p className="text-xs tracking-[0.2em] text-muted-foreground font-medium mb-1">
           RECHERCHER
         </p>
@@ -142,10 +142,10 @@ const CommandPanel = ({
         </h2>
       </div>
 
-      {/* Search Bar with Dropdown */}
+      {/* Search Bar with Dropdown - Hidden on mobile */}
       <div 
         ref={searchContainerRef}
-        className="relative animate-fade-in" 
+        className="relative animate-fade-in hidden lg:block" 
         style={{ animationDelay: "0.1s" }}
       >
         <div className="glass rounded-2xl p-1">
@@ -171,8 +171,8 @@ const CommandPanel = ({
         />
       </div>
 
-      {/* Brand Selection with Dynamic Colors */}
-      <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
+      {/* Brand Selection - Hidden on mobile */}
+      <div className="hidden lg:block animate-fade-in" style={{ animationDelay: "0.2s" }}>
         <p className="text-xs text-muted-foreground mb-2">Ou sélectionnez une marque</p>
         <div className="flex flex-wrap gap-1.5">
           {/* All Brands Option */}
@@ -209,26 +209,31 @@ const CommandPanel = ({
         </div>
       </div>
 
-      {/* SCANNER Button - Clean Minimalist Style (No frame) */}
-      <div className="animate-fade-in pt-4" style={{ animationDelay: "0.3s" }}>
+      {/* SCANNER & GARAGE Buttons - Stacked full-width on mobile */}
+      <div className="animate-fade-in pt-2 lg:pt-4 flex flex-col w-full gap-2 lg:gap-0 lg:block" style={{ animationDelay: "0.3s" }}>
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          className="flex items-center gap-3 py-3 group cursor-pointer"
+          className="flex items-center justify-center lg:justify-start gap-2 lg:gap-3 py-3 px-4 lg:px-0 
+                     w-full lg:w-auto
+                     bg-carbon lg:bg-transparent text-white lg:text-carbon
+                     rounded-full lg:rounded-none
+                     group cursor-pointer"
         >
           {/* Scan icon */}
-          <Scan className="w-8 h-8 text-carbon group-hover:text-mineral transition-colors duration-300" />
-          <span className="font-display text-xl lg:text-2xl text-carbon tracking-wide group-hover:text-mineral transition-colors duration-300 uppercase">
+          <Scan className="w-5 h-5 lg:w-8 lg:h-8 text-white lg:text-carbon group-hover:text-mineral transition-colors duration-300" />
+          <span className="font-display text-sm lg:text-xl text-white lg:text-carbon tracking-wide group-hover:text-mineral transition-colors duration-300 uppercase">
             Scanner ma Trottinette
           </span>
         </motion.button>
         
-        {/* Mon Garage - Transparent Blue Pill Style */}
+        {/* Mon Garage - Full width on mobile */}
         <motion.button
           onClick={() => navigate(user ? '/garage' : '/login')}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.95 }}
-          className="mt-4 flex items-center gap-2 px-5 py-2.5 rounded-full 
+          className="mt-0 lg:mt-4 flex items-center justify-center lg:justify-start gap-2 px-5 py-3 lg:py-2.5 rounded-full 
+                     w-full lg:w-auto
                      bg-garage/10 border border-garage/50 
                      hover:bg-garage hover:border-garage
                      active:bg-garage/80
