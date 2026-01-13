@@ -10,6 +10,7 @@ import GarageButton from "@/components/garage/GarageButton";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandItem, CommandList } from "@/components/ui/command";
 import { useBatteryConfigs, getAvailableVoltages, getAvailableAmperages, getDefaultConfig } from "@/hooks/useBatteryConfigs";
+import { cn } from "@/lib/utils";
 
 // Centralized image mapping
 import { scooterImages } from "@/lib/scooterImageMapping";
@@ -299,6 +300,44 @@ const ScooterCarousel = ({
           </div>
         </div>
       </motion.div>
+
+      {/* Pagination Dots with Dynamic Counter */}
+      <motion.div 
+        className="absolute bottom-[3%] lg:bottom-[4%] left-1/2 -translate-x-1/2 z-20 flex items-center gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        {/* Navigation Dots */}
+        <div className="flex items-center gap-1.5">
+          {models.slice(0, 7).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => onSelect(index)}
+              className={cn(
+                "w-2 h-2 rounded-full transition-all duration-300",
+                index === activeIndex
+                  ? "w-6 bg-mineral"
+                  : "bg-mineral/30 hover:bg-mineral/50"
+              )}
+            />
+          ))}
+        </div>
+        
+        {/* Dynamic Counter */}
+        {models.length > 7 && (
+          <span className="text-sm text-muted-foreground font-medium ml-1">
+            +{models.length - 7}
+          </span>
+        )}
+      </motion.div>
+
+      {/* Watermark piecestrottinettes.fr */}
+      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+        <span className="text-[10px] text-muted-foreground/40 tracking-widest font-medium uppercase">
+          piecestrottinettes.fr
+        </span>
+      </div>
 
       {/* Main Layout: Carousel */}
       <div className="relative flex items-center justify-center w-full h-full px-16 lg:px-20">
