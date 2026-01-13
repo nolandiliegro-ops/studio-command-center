@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Sparkles, Scan, LogIn, Home } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, Scan, Home } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
 import { Brand, ScooterModel } from "@/data/scooterData";
 import { useSearchScooters } from "@/hooks/useScooterData";
@@ -209,50 +209,42 @@ const CommandPanel = ({
         </div>
       </div>
 
-      {/* SCANNER Button - MASSIVE Premium CTA (Style Image 59/60) */}
-      <div className="animate-fade-in pt-3" style={{ animationDelay: "0.3s" }}>
-        <motion.div
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          className="relative"
+      {/* SCANNER Button - Clean Minimalist Style (No frame) */}
+      <div className="animate-fade-in pt-4" style={{ animationDelay: "0.3s" }}>
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          className="flex items-center gap-3 py-3 group cursor-pointer"
         >
-          {/* Glow effect underneath */}
-          <div className="absolute -inset-2 bg-gradient-to-r from-mineral/50 via-emerald-400/50 to-mineral/50 rounded-2xl blur-xl -z-10 opacity-80" />
-          
-          <Button
-            size="lg"
-            className="w-full rounded-2xl py-7 font-display text-lg lg:text-xl tracking-wider gap-4 
-                       bg-gradient-to-r from-mineral via-emerald-600 to-mineral-dark text-white 
-                       hover:from-emerald-600 hover:via-mineral hover:to-emerald-600
-                       shadow-2xl hover:shadow-emerald-500/30 transition-all duration-500 
-                       border-2 border-white/20"
-          >
-            <div className="relative">
-              <Scan className="w-6 h-6 lg:w-7 lg:h-7" />
-              {/* Pulse animation overlay */}
-              <span className="absolute inset-0 rounded-full bg-white/40 animate-ping" />
-            </div>
-            <span className="uppercase">Scanner ma Trottinette</span>
-            <Sparkles className="w-5 h-5 opacity-80" />
-          </Button>
-        </motion.div>
+          {/* Scan icon */}
+          <Scan className="w-8 h-8 text-carbon group-hover:text-mineral transition-colors duration-300" />
+          <span className="font-display text-xl lg:text-2xl text-carbon tracking-wide group-hover:text-mineral transition-colors duration-300 uppercase">
+            Scanner ma Trottinette
+          </span>
+        </motion.button>
         
-        {/* Mon Garage - Exact Header Style */}
-        <Button
+        {/* Mon Garage - Transparent Blue Pill Style */}
+        <motion.button
           onClick={() => navigate(user ? '/garage' : '/login')}
-          className="w-full mt-3 rounded-full py-6 font-display text-lg tracking-wide gap-3 
-                     bg-garage text-garage-foreground hover:bg-garage/90 
-                     shadow-lg hover:shadow-xl transition-all"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.95 }}
+          className="mt-4 flex items-center gap-2 px-5 py-2.5 rounded-full 
+                     bg-garage/10 border border-garage/50 
+                     hover:bg-garage hover:border-garage
+                     active:bg-garage/80
+                     transition-all duration-300 group cursor-pointer"
         >
           {user ? (
-            <div className="w-7 h-7 rounded-full bg-garage-foreground/20 flex items-center justify-center text-sm font-semibold">
+            <div className="w-5 h-5 rounded-full bg-garage/30 group-hover:bg-white/20 flex items-center justify-center text-xs font-semibold text-garage group-hover:text-white transition-colors">
               {profile?.display_name?.charAt(0).toUpperCase() || 'R'}
             </div>
           ) : (
-            <Home className="w-5 h-5" />
+            <Home className="w-4 h-4 text-garage group-hover:text-white transition-colors" />
           )}
-          Mon Garage
-        </Button>
+          <span className="font-display text-sm lg:text-base tracking-wide text-garage group-hover:text-white transition-colors uppercase">
+            Mon Garage
+          </span>
+        </motion.button>
       </div>
     </div>
   );
