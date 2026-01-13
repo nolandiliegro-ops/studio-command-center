@@ -11,14 +11,14 @@ const ScooterHero = ({ scooter }: ScooterHeroProps) => {
   const displayImage = getScooterImage(scooter.slug, scooter.image_url);
 
   return (
-    <section className="relative min-h-[60vh] flex items-center overflow-hidden bg-gradient-to-b from-background via-background to-muted/30">
-      {/* Background Gradient Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-mineral/5 via-transparent to-primary/5 pointer-events-none" />
-      
-      {/* Radial glow behind scooter */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[600px] h-[600px] bg-gradient-radial from-mineral/10 to-transparent rounded-full blur-3xl opacity-50" />
-      </div>
+    <section 
+      className="relative min-h-[60vh] flex items-center overflow-hidden"
+      style={{
+        backgroundImage: 'url(/garage-floor.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
 
       <div className="container mx-auto px-4 lg:px-8 py-12 lg:py-20">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
