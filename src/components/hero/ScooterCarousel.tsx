@@ -170,7 +170,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
       </div>
 
       {/* Refined Navigation */}
-      <div className="flex items-center justify-center gap-6 mt-8">
+      <div className="flex items-center justify-center gap-6 mt-4">
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
           <Button
             variant="outline"
@@ -218,7 +218,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
       {activeModel && (
         <motion.div 
           key={activeModel.id}
-          className="mt-8 text-center"
+          className="mt-4 text-center"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15 }}
@@ -237,7 +237,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
 
           {/* Model Name - Elegant */}
           <motion.h3 
-            className="font-display text-3xl lg:text-4xl text-carbon mb-4 tracking-wide"
+            className="font-display text-3xl lg:text-4xl text-carbon mb-3 tracking-wide"
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
@@ -247,7 +247,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
           
           {/* Performance Stats - Clean Layout */}
           <motion.div 
-            className="flex items-center justify-center gap-6 mb-4"
+            className="flex items-center justify-center gap-6 mb-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -296,7 +296,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
 
           {/* Compatible Parts Badge - Refined */}
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-mineral/15 backdrop-blur-sm mb-4"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-mineral/15 backdrop-blur-sm mb-3"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.35 }}
