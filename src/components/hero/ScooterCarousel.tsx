@@ -109,7 +109,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
                   transition: "transform 0.5s ease-out, opacity 0.5s ease-out",
                 }}
               >
-                <div className="relative w-full max-w-[620px] mx-auto h-[620px] flex items-center justify-center">
+                <div className="relative w-full max-w-[420px] mx-auto h-[380px] lg:h-[420px] flex items-center justify-center">
                   {/* Favorite & Garage Buttons */}
                   <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
                     <FavoriteButton
@@ -170,7 +170,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
       </div>
 
       {/* Refined Navigation */}
-      <div className="flex items-center justify-center gap-6 mt-6">
+      <div className="flex items-center justify-center gap-6 mt-4">
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
           <Button
             variant="outline"
@@ -218,14 +218,14 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
       {activeModel && (
         <motion.div 
           key={activeModel.id}
-          className="mt-6 text-center"
+          className="mt-4 text-center"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15 }}
         >
           {/* Brand Badge - Subtle */}
           <motion.div
-            className="inline-block px-4 py-1 rounded-full bg-white/70 border border-mineral/20 backdrop-blur-sm mb-3"
+            className="inline-block px-3 py-0.5 rounded-full bg-white/70 border border-mineral/20 backdrop-blur-sm mb-2"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -237,7 +237,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
 
           {/* Model Name - Elegant */}
           <motion.h3 
-            className="font-display text-3xl lg:text-4xl text-carbon mb-3 tracking-wide"
+            className="font-display text-2xl lg:text-3xl text-carbon mb-2 tracking-wide"
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
@@ -247,7 +247,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
           
           {/* Performance Stats - Clean Layout */}
           <motion.div 
-            className="flex items-center justify-center gap-6 mb-3"
+            className="flex items-center justify-center gap-5 mb-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -258,73 +258,54 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
                 <Zap className="w-3.5 h-3.5" />
                 <AnimatedNumber 
                   value={parseSpecValue(activeModel.specs.power)} 
-                  className="font-mono text-lg font-semibold"
+                  className="font-mono text-base font-semibold"
                 />
-                <span className="text-sm font-mono">W</span>
+                <span className="text-xs font-mono">W</span>
               </div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide mt-0.5">Power</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Power</span>
             </div>
 
-            <div className="w-px h-6 bg-border" />
+            <div className="w-px h-5 bg-border" />
 
             {/* Speed */}
             <div className="flex flex-col items-center">
               <div className="flex items-center gap-1 text-mineral">
                 <AnimatedNumber 
                   value={parseSpecValue(activeModel.specs.maxSpeed)} 
-                  className="font-mono text-lg font-semibold"
+                  className="font-mono text-base font-semibold"
                 />
-                <span className="text-sm font-mono">km/h</span>
+                <span className="text-xs font-mono">km/h</span>
               </div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide mt-0.5">Vitesse</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Vitesse</span>
             </div>
 
-            <div className="w-px h-6 bg-border" />
+            <div className="w-px h-5 bg-border" />
 
             {/* Range */}
             <div className="flex flex-col items-center">
               <div className="flex items-center gap-1 text-mineral">
                 <AnimatedNumber 
                   value={parseSpecValue(activeModel.specs.range)} 
-                  className="font-mono text-lg font-semibold"
+                  className="font-mono text-base font-semibold"
                 />
-                <span className="text-sm font-mono">km</span>
+                <span className="text-xs font-mono">km</span>
               </div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide mt-0.5">Autonomie</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Autonomie</span>
             </div>
           </motion.div>
 
           {/* Compatible Parts Badge - Refined */}
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-mineral/15 backdrop-blur-sm mb-2"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 border border-mineral/15 backdrop-blur-sm"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.35 }}
           >
-            <span className="text-muted-foreground text-sm">Pièces compatibles:</span>
+            <span className="text-muted-foreground text-xs">Pièces compatibles:</span>
             <AnimatedNumber 
               value={activeModel.compatibleParts} 
-              className="text-mineral font-semibold text-base"
+              className="text-mineral font-semibold text-sm"
             />
-          </motion.div>
-
-          {/* CTA Button - Apple-style Clean */}
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Button 
-              onClick={() => {
-                document.getElementById('bento-discovery')?.scrollIntoView({ 
-                  behavior: 'smooth' 
-                });
-              }}
-              className="rounded-full px-7 py-5 font-display text-base tracking-wide gap-2 bg-mineral text-white hover:bg-mineral-dark transition-all shadow-sm hover:shadow-md"
-            >
-              EXPLORER LES PIÈCES
-              <ArrowRight className="w-4 h-4" />
-            </Button>
           </motion.div>
         </motion.div>
       )}
