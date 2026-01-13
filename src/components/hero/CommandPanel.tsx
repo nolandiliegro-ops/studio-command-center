@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Sparkles, Home, Scan } from "lucide-react";
+import { Search, Sparkles, Scan, LogIn, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Brand, ScooterModel } from "@/data/scooterData";
@@ -7,6 +7,8 @@ import { useSearchScooters } from "@/hooks/useScooterData";
 import SearchDropdown from "./SearchDropdown";
 import { motion } from "framer-motion";
 import AnimatedNumber from "@/components/ui/animated-number";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 interface CommandPanelProps {
   brands: Brand[];
@@ -40,6 +42,8 @@ const CommandPanel = ({
   onModelSelect,
   activeModel,
 }: CommandPanelProps) => {
+  const navigate = useNavigate();
+  const { user, profile } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   
@@ -205,41 +209,48 @@ const CommandPanel = ({
         </div>
       </div>
 
-      {/* SCANNER Button - Premium Redesign with Glow */}
-      <div className="animate-fade-in pt-2" style={{ animationDelay: "0.3s" }}>
+      {/* SCANNER Button - MASSIVE Premium CTA (Style Image 59/60) */}
+      <div className="animate-fade-in pt-3" style={{ animationDelay: "0.3s" }}>
         <motion.div
-          whileHover={{ scale: 1.03 }}
+          whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
           className="relative"
         >
           {/* Glow effect underneath */}
-          <div className="absolute -inset-1 bg-mineral/40 rounded-2xl blur-xl -z-10 opacity-70" />
+          <div className="absolute -inset-2 bg-gradient-to-r from-mineral/50 via-emerald-400/50 to-mineral/50 rounded-2xl blur-xl -z-10 opacity-80" />
           
           <Button
             size="lg"
-            className="w-full rounded-2xl py-6 font-display text-base tracking-wider gap-3 
-                       bg-gradient-to-r from-mineral to-mineral-dark text-white 
-                       hover:from-mineral-dark hover:to-mineral 
-                       shadow-lg hover:shadow-xl transition-all border border-mineral-glow/30"
+            className="w-full rounded-2xl py-7 font-display text-lg lg:text-xl tracking-wider gap-4 
+                       bg-gradient-to-r from-mineral via-emerald-600 to-mineral-dark text-white 
+                       hover:from-emerald-600 hover:via-mineral hover:to-emerald-600
+                       shadow-2xl hover:shadow-emerald-500/30 transition-all duration-500 
+                       border-2 border-white/20"
           >
             <div className="relative">
-              <Scan className="w-5 h-5" />
+              <Scan className="w-6 h-6 lg:w-7 lg:h-7" />
               {/* Pulse animation overlay */}
               <span className="absolute inset-0 rounded-full bg-white/40 animate-ping" />
             </div>
-            <span>SCANNER MA TROTTINETTE</span>
-            <Sparkles className="w-4 h-4 opacity-70" />
+            <span className="uppercase">Scanner ma Trottinette</span>
+            <Sparkles className="w-5 h-5 opacity-80" />
           </Button>
         </motion.div>
         
-        {/* Mon Garage - Secondary */}
+        {/* Mon Garage - Exact Header Style */}
         <Button
-          variant="outline"
-          size="lg"
-          className="w-full mt-3 rounded-2xl py-5 font-display text-base tracking-wide gap-2 
-                     bg-garage/10 border-garage/30 text-garage hover:bg-garage hover:text-white transition-all"
+          onClick={() => navigate(user ? '/garage' : '/login')}
+          className="w-full mt-3 rounded-full py-6 font-display text-lg tracking-wide gap-3 
+                     bg-garage text-garage-foreground hover:bg-garage/90 
+                     shadow-lg hover:shadow-xl transition-all"
         >
-          <Home className="w-4 h-4" />
+          {user ? (
+            <div className="w-7 h-7 rounded-full bg-garage-foreground/20 flex items-center justify-center text-sm font-semibold">
+              {profile?.display_name?.charAt(0).toUpperCase() || 'R'}
+            </div>
+          ) : (
+            <Home className="w-5 h-5" />
+          )}
           Mon Garage
         </Button>
       </div>
