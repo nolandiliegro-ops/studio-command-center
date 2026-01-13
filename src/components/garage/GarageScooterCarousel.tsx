@@ -104,7 +104,15 @@ const GarageScooterCarousel = ({ scooters, onScooterChange, className }: GarageS
   }
   
   const model = currentScooter.scooter_model;
-  const displayName = currentScooter.nickname || `${model.brand} ${model.name}`;
+
+  const safeBrandName = (brand: unknown) => {
+    if (typeof brand === "string") return brand;
+    if (brand && typeof brand === "object" && "name" in (brand as any)) return (brand as any).name as string;
+    return "Unknown";
+  };
+
+  const brandName = safeBrandName((model as any).brand);
+  const displayName = currentScooter.nickname || `${brandName} ${model.name}`;
   
   // Get HD image: DB image_url first, then local mapping
   const officialImage = getScooterImage(model.slug, model.image_url);
@@ -127,7 +135,7 @@ const GarageScooterCarousel = ({ scooters, onScooterChange, className }: GarageS
         {/* Brand Badge */}
         <div className="absolute top-3 left-3 z-10 px-3 py-1.5 bg-white/80 backdrop-blur-sm rounded-full border border-mineral/20 shadow-sm">
           <span className="text-xs font-semibold text-mineral uppercase tracking-wider">
-            {model.brand}
+            {brandName}
           </span>
         </div>
 
