@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { Loader2, Trophy, Package, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import GarageScooterCarousel from '@/components/garage/GarageScooterCarousel';
+import HorizontalShowroomCarousel from '@/components/garage/HorizontalShowroomCarousel';
 import TechnicalSpecs from '@/components/garage/TechnicalSpecs';
 import MaintenanceLog from '@/components/garage/MaintenanceLog';
 import ScooterVideoSection from '@/components/garage/ScooterVideoSection';
@@ -185,20 +186,18 @@ const Garage = () => {
             </motion.div>
           </div>
 
-          {/* Bottom Row: Compatible Parts - Horizontal Scroll */}
-          {selectedScooter && (
+          {/* Bottom Row: Horizontal Showroom Carousel */}
+          {!scootersLoading && scooters && scooters.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.3 }}
               className="mt-4 shrink-0"
             >
-              <CompactProductsRow
-                scooterId={selectedScooter.id}
-                scooterName={scooterName}
-                parts={parts || []}
-                loading={partsLoading}
-                onViewPart={(partId) => navigate(`/part/${partId}`)}
+              <HorizontalShowroomCarousel
+                scooters={scooters}
+                selectedScooterId={selectedScooter?.id || null}
+                onScooterSelect={setSelectedScooter}
               />
             </motion.div>
           )}
