@@ -296,7 +296,7 @@ const ScooterCarousel = ({ models, activeIndex, onSelect }: ScooterCarouselProps
 
           {/* Compatible Parts Badge - Refined */}
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-mineral/15 backdrop-blur-sm mb-3"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-mineral/15 backdrop-blur-sm mb-2"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.35 }}
