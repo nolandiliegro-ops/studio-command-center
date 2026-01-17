@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ShoppingBag, X } from "lucide-react";
+import { ShoppingBag, Edit3 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -15,11 +16,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const CartSidebar = () => {
   const { items, isOpen, setIsOpen, totals, clearCart } = useCart();
+  const navigate = useNavigate();
   const isEmpty = items.length === 0;
 
   const handleCheckout = () => {
-    // TODO: Implement checkout logic
-    console.log("Proceeding to checkout...", items);
+    setIsOpen(false);
+    navigate('/checkout');
   };
 
   return (
@@ -114,6 +116,16 @@ const CartSidebar = () => {
                   <span className="relative z-10">COMMANDER</span>
                 </Button>
               </motion.div>
+
+              {/* Modify Cart Link - Ghost Button Style */}
+              <Link 
+                to="/panier" 
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-carbon transition-colors group"
+              >
+                <Edit3 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span>Modifier le panier</span>
+              </Link>
 
               {/* Security badge */}
               <p className="text-xs text-center text-muted-foreground">
