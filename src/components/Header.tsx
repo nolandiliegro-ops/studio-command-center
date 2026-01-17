@@ -1,9 +1,10 @@
 import { Search, ShoppingCart, Menu, Home, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
+import { cn } from "@/lib/utils";
 import logoImage from "@/assets/logo-pt.png";
 import {
   DropdownMenu,
@@ -15,9 +16,21 @@ import {
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const prevCountRef = useRef(0);
   const { user, profile, signOut } = useAuth();
   const { setIsOpen: openCart, totals } = useCart();
   const navigate = useNavigate();
+
+  // Shimmer animation when item count increases
+  useEffect(() => {
+    if (totals.itemCount > prevCountRef.current) {
+      setIsAnimating(true);
+      const timer = setTimeout(() => setIsAnimating(false), 1500);
+      return () => clearTimeout(timer);
+    }
+    prevCountRef.current = totals.itemCount;
+  }, [totals.itemCount]);
 
   const navLinks = [
     { label: "Accueil", href: "/" },
@@ -80,7 +93,12 @@ const Header = () => {
             >
               <ShoppingCart className="w-5 h-5" />
               {totals.itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-mineral text-white text-xs flex items-center justify-center font-medium animate-scale-in">
+                <span 
+                  className={cn(
+                    "absolute -top-1 -right-1 w-5 h-5 rounded-full bg-mineral text-white text-xs flex items-center justify-center font-medium",
+                    isAnimating && "animate-shimmer bg-[length:200%_100%] bg-[linear-gradient(90deg,hsl(var(--mineral))_0%,hsl(var(--mineral))_35%,rgba(255,255,255,0.4)_50%,hsl(var(--mineral))_65%,hsl(var(--mineral))_100%)]"
+                  )}
+                >
                   {totals.itemCount > 99 ? '99+' : totals.itemCount}
                 </span>
               )}
