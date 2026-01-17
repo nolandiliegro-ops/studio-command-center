@@ -54,7 +54,7 @@ const TutorialCard = ({ tutorial, index, onClick }: TutorialCardProps) => {
       onClick={onClick}
       className="group cursor-pointer"
     >
-      <div className="bg-white/60 backdrop-blur-md border border-white/30 rounded-2xl overflow-hidden 
+        <div className="bg-white/60 backdrop-blur-md border border-carbon/10 rounded-2xl overflow-hidden 
                       shadow-lg hover:shadow-2xl hover:shadow-mineral/10 transition-all duration-500">
         
         {/* Thumbnail */}
@@ -99,7 +99,7 @@ const TutorialCard = ({ tutorial, index, onClick }: TutorialCardProps) => {
           {/* Scooter Model Tag */}
           {tutorial.scooter && (
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full 
-                            bg-mineral/10 text-mineral text-xs font-medium mb-3">
+                            bg-mineral/15 text-mineral text-xs font-medium mb-3">
               <Zap className="w-3 h-3" />
               {tutorial.scooter.brand?.name} {tutorial.scooter.name}
             </div>

@@ -23,7 +23,12 @@ const Pepites = () => {
   });
 
   return (
-    <div className="min-h-screen bg-greige">
+    <div 
+      className="min-h-screen bg-greige"
+      style={{
+        backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 60%)'
+      }}
+    >
       <Header />
       
       <main className="pt-20">
@@ -86,7 +91,7 @@ const Pepites = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="inline-flex items-center gap-2 mt-8 px-5 py-2.5 bg-mineral/10 rounded-full border border-mineral/20"
+                className="inline-flex items-center gap-2 mt-8 px-5 py-2.5 bg-mineral/15 rounded-full border border-mineral/20"
               >
                 <Sparkles className="w-4 h-4 text-mineral" />
                 <span className="text-sm font-medium text-mineral tracking-wide">

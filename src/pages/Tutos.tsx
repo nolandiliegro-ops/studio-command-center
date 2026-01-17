@@ -96,7 +96,12 @@ const Tutos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-greige">
+    <div 
+      className="min-h-screen bg-greige"
+      style={{
+        backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 60%)'
+      }}
+    >
       <Header />
       
       {/* Hero Section */}
@@ -113,7 +118,7 @@ const Tutos = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-mineral/10 border border-mineral/20 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-mineral/15 border border-mineral/20 mb-6">
               <GraduationCap className="w-4 h-4 text-mineral" />
               <span className="text-sm font-medium text-mineral tracking-wide uppercase">
                 Formation Technique
