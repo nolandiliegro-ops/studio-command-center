@@ -15,6 +15,9 @@ import Register from "./pages/Register";
 import Garage from "./pages/Garage";
 import Admin from "./pages/Admin";
 import ScooterDetail from "./pages/ScooterDetail";
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import GarageErrorBoundary from "./components/garage/GarageErrorBoundary";
 import NotFound from "./pages/NotFound";
@@ -38,6 +41,9 @@ const App = () => (
             <Route path="/scooter/:slug" element={<ScooterDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/panier" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/order-success" element={<OrderSuccessPage />} />
             <Route path="/garage" element={
               <ProtectedRoute>
                 <GarageErrorBoundary>
