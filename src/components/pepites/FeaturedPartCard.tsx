@@ -44,7 +44,7 @@ const FeaturedPartCard = ({ part, index }: FeaturedPartCardProps) => {
       }}
     >
       <Link to={`/piece/${part.slug}`} className="group block">
-        <div className="relative bg-white/60 backdrop-blur-md rounded-3xl border border-white/20 overflow-hidden transition-all duration-500 ease-out group-hover:scale-[1.02] group-hover:shadow-2xl group-hover:shadow-mineral/20">
+        <div className="relative bg-white/60 backdrop-blur-md rounded-3xl border border-carbon/10 overflow-hidden transition-all duration-500 ease-out group-hover:scale-[1.02] group-hover:shadow-2xl group-hover:shadow-mineral/20">
           {/* Image Container */}
           <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-greige to-white">
             {part.image_url ? (

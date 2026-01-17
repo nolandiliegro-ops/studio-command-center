@@ -63,7 +63,7 @@ const CategoryBentoGrid = ({
         whileTap={{ scale: 0.98 }}
         onClick={() => onCategoryChange(null)}
         className={cn(
-          "relative w-24 md:w-28 lg:w-32 aspect-[4/5] rounded-2xl overflow-hidden flex-shrink-0",
+          "relative w-24 md:w-28 lg:w-32 aspect-[4/5] rounded-2xl overflow-hidden flex-shrink-0 border border-white/10",
           activeCategory === null && "ring-2 ring-mineral ring-offset-2 ring-offset-greige"
         )}
       >
@@ -110,7 +110,7 @@ const CategoryBentoGrid = ({
             whileTap={{ scale: 0.98 }}
             onClick={() => onCategoryChange(category.id)}
             className={cn(
-              "relative w-24 md:w-28 lg:w-32 aspect-[4/5] rounded-2xl overflow-hidden flex-shrink-0",
+              "relative w-24 md:w-28 lg:w-32 aspect-[4/5] rounded-2xl overflow-hidden flex-shrink-0 border border-white/10",
               isActive && "ring-2 ring-mineral ring-offset-2 ring-offset-greige"
             )}
           >

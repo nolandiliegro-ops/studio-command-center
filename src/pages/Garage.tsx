@@ -268,7 +268,7 @@ const CompactProductsRow = ({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2, delay: index * 0.03 }}
             onClick={() => onViewPart(part.id)}
-            className="flex-shrink-0 w-36 bg-white/80 border border-mineral/20 rounded-xl p-3 
+            className="flex-shrink-0 w-36 bg-white/80 border border-carbon/10 rounded-xl p-3 
                        hover:shadow-lg hover:border-mineral/40 transition-all cursor-pointer group"
           >
             {/* Image - Luxury Studio Style */}

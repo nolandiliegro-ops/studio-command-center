@@ -111,9 +111,9 @@ const PartCard = forwardRef<HTMLDivElement, PartCardProps>(
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
       className={cn(
-        "group relative rounded-xl p-4 transition-all duration-300 cursor-pointer",
+        "group relative rounded-xl p-5 transition-all duration-300 cursor-pointer",
         "bg-white/80 backdrop-blur-sm",
-        "border border-mineral/10",
+        "border border-carbon/10",
         "hover:scale-[1.01] hover:shadow-lg",
         "hover:border-mineral/40",
         className
@@ -220,7 +220,7 @@ const PartCard = forwardRef<HTMLDivElement, PartCardProps>(
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.1 + 0.2 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-mineral/10 border border-mineral/20"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-mineral/15 border border-mineral/20"
           >
             <div className="w-2 h-2 rounded-full bg-mineral animate-pulse" />
             <span className="text-xs text-mineral font-medium">
