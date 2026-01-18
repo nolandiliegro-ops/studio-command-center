@@ -305,12 +305,12 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Spotlight Search Trigger */}
+            {/* Spotlight Search Trigger - Desktop Only (Mobile uses Dock) */}
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={openSpotlight}
-              className="relative text-foreground/80 hover:text-foreground group"
+              className="relative text-foreground/80 hover:text-foreground group hidden md:flex"
             >
               <Search className="w-5 h-5" />
               {/* ⌘K shortcut indicator */}
@@ -321,11 +321,12 @@ const Header = () => {
               </span>
             </Button>
             
+            {/* Cart Button - Desktop Only (Mobile uses Dock) */}
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => openCart(true)}
-              className="relative text-foreground/80 hover:text-foreground"
+              className="relative text-foreground/80 hover:text-foreground hidden md:flex"
             >
               <ShoppingCart className="w-5 h-5" />
               {totals.itemCount > 0 && (
