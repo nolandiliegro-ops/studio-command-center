@@ -59,11 +59,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         // === LOGS DE DEBUG AUTH ===
         console.log('[Auth] ========== AUTH STATE CHANGE ==========');
         console.log('[Auth] Event:', event);
         console.log('[Auth] Session exists:', !!session);
+        console.log('[Auth] Current path:', window.location.pathname);
         
         if (session?.user) {
           console.log('[Auth] User ID:', session.user.id);
@@ -74,32 +75,37 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           if (event === 'SIGNED_IN' && session.user.app_metadata?.provider === 'google') {
             console.log('[Auth] ========== GOOGLE OAUTH SUCCESS ==========');
             console.log('[Auth] ✅ Connexion Google réussie pour:', session.user.email);
+            console.log('[Auth] User sera redirigé vers /garage par le router');
           }
         }
         
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Defer profile fetch with setTimeout to prevent deadlock
+        // Fetch profile BEFORE setting loading to false for proper sync
         if (session?.user) {
-          setTimeout(() => {
-            fetchProfile(session.user.id).then(setProfile);
-          }, 0);
+          const profile = await fetchProfile(session.user.id);
+          setProfile(profile);
+          console.log('[Auth] ✅ Profile chargé:', profile?.display_name || 'Aucun nom');
         } else {
           setProfile(null);
         }
         
         setLoading(false);
+        console.log('[Auth] ✅ Loading terminé, état synchronisé');
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      console.log('[Auth] Initial session check:', !!session);
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchProfile(session.user.id).then(setProfile);
+        const profile = await fetchProfile(session.user.id);
+        setProfile(profile);
+        console.log('[Auth] Initial profile loaded:', profile?.display_name || 'Aucun nom');
       }
       
       setLoading(false);
@@ -140,7 +146,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signInWithGoogle = async () => {
-    const redirectUrl = `${window.location.origin}/`;
+    // Redirection explicite vers /garage après OAuth
+    const redirectUrl = `${window.location.origin}/garage`;
     
     // === LOGS DE DEBUG GOOGLE OAUTH ===
     console.log('[Google OAuth] ========== STARTING AUTHENTICATION ==========');

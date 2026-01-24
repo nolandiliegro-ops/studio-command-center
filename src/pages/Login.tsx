@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -21,9 +21,29 @@ const Login = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Rediriger automatiquement si déjà connecté
+  useEffect(() => {
+    if (!authLoading && user) {
+      console.log('[Login] ✅ Utilisateur déjà connecté, redirection vers /garage');
+      navigate('/garage', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
+
+  // Afficher un spinner pendant la vérification de session
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-greige flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-garage" />
+          <p className="text-carbon/60 font-medium">Vérification de la session...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
