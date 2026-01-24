@@ -1,14 +1,30 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import CompatiblePartsSection from "@/components/CompatiblePartsSection";
 import FavoritesSection from "@/components/home/FavoritesSection";
+import { useBrands, useScooterModels } from "@/hooks/useScooterData";
 
 const Index = () => {
   const [activeModelSlug, setActiveModelSlug] = useState<string | null>(null);
   const [activeModelName, setActiveModelName] = useState<string | null>(null);
+
+  // 📊 TÉLÉMÉTRIE CATALOGUE - Debug showroom vide
+  const { data: brands, isLoading: brandsLoading, error: brandsError } = useBrands();
+  const { data: models, isLoading: modelsLoading, error: modelsError } = useScooterModels(null);
+  
+  useEffect(() => {
+    console.log('📦 État du catalogue:', {
+      brandsCount: brands?.length || 0,
+      modelsCount: models?.length || 0,
+      brandsLoading,
+      modelsLoading,
+      brandsError: brandsError?.message || null,
+      modelsError: modelsError?.message || null,
+    });
+  }, [brands, models, brandsLoading, modelsLoading, brandsError, modelsError]);
 
   const handleActiveModelChange = useCallback((slug: string | null, name: string | null) => {
     setActiveModelSlug(slug);
