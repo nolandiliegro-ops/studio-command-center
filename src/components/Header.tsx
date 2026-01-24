@@ -67,12 +67,14 @@ const Header = () => {
     navigate('/');
   };
 
-  // 🚨 BOUTON DE SECOURS - Force le rechargement du catalogue
+  // 🚨 BOUTON DE SECOURS - Force le rechargement du catalogue + hard reload
   const handleForceRefresh = () => {
-    console.log('🚨 CATALOGUE FORCE REFRESH: clearing and invalidating cache');
+    console.log('🚨 CATALOGUE FORCE REFRESH: clearing cache + hard reload');
     queryClient.clear();
     queryClient.invalidateQueries();
-    toast.success('Catalogue rechargé !');
+    toast.success('Rechargement en cours...');
+    // Hard reload pour garantir un état propre
+    setTimeout(() => window.location.reload(), 500);
   };
 
   // Check if user has scooters in garage
