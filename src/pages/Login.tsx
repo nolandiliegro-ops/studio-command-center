@@ -64,14 +64,38 @@ const Login = () => {
   };
 
   const handleGoogleSignIn = async () => {
+    console.log('[Login] 🔵 Bouton Google cliqué');
+    console.log('[Login] Current URL:', window.location.href);
+    
     setIsGoogleLoading(true);
     const { error } = await signInWithGoogle();
     setIsGoogleLoading(false);
 
     if (error) {
+      console.error('[Login] ❌ Échec Google OAuth:', error);
+      
+      // Messages d'erreur localisés et informatifs
+      let errorTitle = "Erreur Google";
+      let errorMessage = error.message;
+      
+      if (error.message.includes('popup')) {
+        errorMessage = "Popup bloquée. Autorisez les popups pour ce site.";
+      } else if (error.message.includes('network')) {
+        errorMessage = "Erreur réseau. Vérifiez votre connexion.";
+      } else if (error.message.includes('redirect_uri_mismatch')) {
+        errorTitle = "Configuration incorrecte";
+        errorMessage = "Erreur de configuration OAuth. Contactez l'administrateur.";
+      } else if (error.message.includes('invalid_client')) {
+        errorTitle = "Configuration incorrecte";
+        errorMessage = "Identifiants Google invalides. Contactez l'administrateur.";
+      } else if (error.message.includes('access_denied')) {
+        errorTitle = "Accès refusé";
+        errorMessage = "Vous avez refusé l'accès ou votre compte n'est pas autorisé.";
+      }
+      
       toast({
-        title: "Erreur Google",
-        description: error.message,
+        title: errorTitle,
+        description: errorMessage,
         variant: "destructive",
       });
     }
