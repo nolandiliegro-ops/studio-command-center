@@ -60,6 +60,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        // === LOGS DE DEBUG AUTH ===
+        console.log('[Auth] ========== AUTH STATE CHANGE ==========');
+        console.log('[Auth] Event:', event);
+        console.log('[Auth] Session exists:', !!session);
+        
+        if (session?.user) {
+          console.log('[Auth] User ID:', session.user.id);
+          console.log('[Auth] User email:', session.user.email);
+          console.log('[Auth] Provider:', session.user.app_metadata?.provider);
+          
+          // Confirmation spécifique Google OAuth
+          if (event === 'SIGNED_IN' && session.user.app_metadata?.provider === 'google') {
+            console.log('[Auth] ========== GOOGLE OAUTH SUCCESS ==========');
+            console.log('[Auth] ✅ Connexion Google réussie pour:', session.user.email);
+          }
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -125,13 +142,54 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signInWithGoogle = async () => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-      },
-    });
-    return { error };
+    // === LOGS DE DEBUG GOOGLE OAUTH ===
+    console.log('[Google OAuth] ========== STARTING AUTHENTICATION ==========');
+    console.log('[Google OAuth] Current origin:', window.location.origin);
+    console.log('[Google OAuth] Redirect URL:', redirectUrl);
+    console.log('[Google OAuth] Expected callback: https://kqsxscjtlipregkrmucg.supabase.co/auth/v1/callback');
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+        },
+      });
+      
+      if (error) {
+        console.error('[Google OAuth] ========== ERROR ==========');
+        console.error('[Google OAuth] Message:', error.message);
+        console.error('[Google OAuth] Full error:', error);
+        
+        // Diagnostic automatique
+        if (error.message.includes('redirect_uri_mismatch')) {
+          console.error('[Google OAuth] 🔴 DIAGNOSTIC: redirect_uri_mismatch');
+          console.error('[Google OAuth] ACTION: Vérifiez les "Authorized redirect URIs" dans Google Cloud Console');
+          console.error('[Google OAuth] URI attendue: https://kqsxscjtlipregkrmucg.supabase.co/auth/v1/callback');
+        } else if (error.message.includes('invalid_client')) {
+          console.error('[Google OAuth] 🔴 DIAGNOSTIC: invalid_client');
+          console.error('[Google OAuth] ACTION: Le Client ID ou Client Secret est incorrect dans Lovable Cloud');
+        } else if (error.message.includes('requested path is invalid')) {
+          console.error('[Google OAuth] 🔴 DIAGNOSTIC: Site URL mismatch');
+          console.error('[Google OAuth] ACTION: Vérifiez Site URL dans Lovable Cloud Auth Settings');
+        } else if (error.message.includes('access_denied')) {
+          console.error('[Google OAuth] 🔴 DIAGNOSTIC: access_denied');
+          console.error('[Google OAuth] ACTION: L\'utilisateur a refusé l\'accès ou le compte Google n\'est pas autorisé');
+        }
+        
+        return { error };
+      }
+      
+      console.log('[Google OAuth] ========== REDIRECT INITIATED ==========');
+      console.log('[Google OAuth] Provider:', data?.provider);
+      console.log('[Google OAuth] Redirect URL:', data?.url);
+      
+      return { error: null };
+    } catch (e) {
+      console.error('[Google OAuth] ========== UNEXPECTED ERROR ==========');
+      console.error('[Google OAuth] Exception:', e);
+      return { error: e as Error };
+    }
   };
 
   const refreshProfile = async () => {
