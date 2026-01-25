@@ -102,23 +102,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             console.log('[Auth] ✅ Cache invalidé - refetch forcé');
           }
           
-          // 🚀 HARD REDIRECT GOOGLE OAUTH - Contourne le router React
+          // ✅ GOOGLE OAUTH SUCCESS - Pas de redirect, laisser React Router gérer
           if (event === 'SIGNED_IN' && session.user.app_metadata?.provider === 'google') {
             console.log('[Auth] ========== GOOGLE OAUTH SUCCESS ==========');
             console.log('[Auth] ✅ Connexion Google réussie pour:', session.user.email);
-            
-            // Garde anti-boucle: ne pas rediriger si déjà sur /garage
-            if (window.location.pathname !== '/garage') {
-              console.log('🚀 NAVIGATION FORCÉE VERS LE GARAGE ACTIVÉE');
-              console.log('[Auth] 🚀 Hard redirect vers /garage (bypass router)');
-              console.log('[Auth] Path actuel:', window.location.pathname);
-              
-              // HARD REDIRECT - Force le navigateur à recharger /garage
-              window.location.href = '/garage';
-              return; // Stop l'exécution pour éviter les mises à jour d'état orphelines
-            } else {
-              console.log('[Auth] ✅ Déjà sur /garage, pas de redirection nécessaire');
-            }
+            console.log('[Auth] ✅ Données chargées, React Router va gérer la navigation');
           }
         }
         
