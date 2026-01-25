@@ -86,20 +86,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           console.log('[Auth] User email:', session.user.email);
         console.log('[Auth] Provider:', session.user.app_metadata?.provider);
           
-          // 🔄 INVALIDATION CACHE CATALOGUE - Se déclenche sur SIGNED_IN et INITIAL_SESSION
+          // 🔄 REFETCH IMMÉDIAT CATALOGUE - Se déclenche sur SIGNED_IN et INITIAL_SESSION
           if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
-            console.log(`[Auth] 🔄 Invalidation catalogue (event=${event}, user=${session.user.email})`);
+            console.log(`[Auth] 🔄 Refetch immédiat catalogue (event=${event}, user=${session.user.email})`);
             
-            // Invalider les queries pour forcer le refetch (sans clear() qui supprime tout)
-            queryClient.invalidateQueries({ queryKey: ['brands'] });
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            queryClient.invalidateQueries({ queryKey: ['scooter_models'] });
-            queryClient.invalidateQueries({ queryKey: ['all_parts'] });
-            queryClient.invalidateQueries({ queryKey: ['compatible_parts'] });
-            queryClient.invalidateQueries({ queryKey: ['parent-categories'] });
-            queryClient.invalidateQueries({ queryKey: ['user_scooters'] });
-            queryClient.invalidateQueries({ queryKey: ['garage'] });
-            console.log('[Auth] ✅ Cache invalidé - refetch forcé');
+            // REFETCH ACTIF au lieu d'invalidation passive
+            queryClient.refetchQueries({ queryKey: ['brands'], type: 'active' });
+            queryClient.refetchQueries({ queryKey: ['categories'], type: 'active' });
+            queryClient.refetchQueries({ queryKey: ['scooter_models'], type: 'active' });
+            queryClient.refetchQueries({ queryKey: ['all_parts'], type: 'active' });
+            queryClient.refetchQueries({ queryKey: ['compatible_parts'], type: 'active' });
+            queryClient.refetchQueries({ queryKey: ['parent-categories'], type: 'active' });
+            queryClient.refetchQueries({ queryKey: ['user_scooters'], type: 'active' });
+            queryClient.refetchQueries({ queryKey: ['garage'], type: 'active' });
+            console.log('[Auth] ✅ Refetch actif lancé - données en cours de rechargement');
           }
           
           // ✅ GOOGLE OAUTH SUCCESS - Pas de redirect, laisser React Router gérer
