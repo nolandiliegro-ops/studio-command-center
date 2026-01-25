@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Wrench, ArrowRight, ImageIcon } from 'lucide-react';
+import { SafeImage } from '@/components/ui/SafeImage';
 import { cn } from '@/lib/utils';
 import { getScooterImage } from '@/lib/scooterImageMapping';
 import ScooterPlaceholder from './ScooterPlaceholder';
@@ -310,11 +311,13 @@ const GarageScooterCarousel = ({
                     : "border-white/40 opacity-70"
                 )}
               >
-                {image ? (
-                  <img src={image} alt={scooterModel.name} className="w-full h-full object-contain p-1" />
-                ) : (
-                  <span className="text-2xl flex items-center justify-center h-full">🛴</span>
-                )}
+                <SafeImage
+                  src={image}
+                  alt={scooterModel.name}
+                  className="w-full h-full object-contain p-1"
+                  containerClassName="w-full h-full"
+                  fallback={<span className="text-2xl flex items-center justify-center h-full">🛴</span>}
+                />
                 {scooterModel.voltage && (
                   <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] px-1 py-0.5 bg-orange-100/90 text-orange-700 rounded">
                     {scooterModel.voltage}V

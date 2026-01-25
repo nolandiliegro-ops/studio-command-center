@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Minus, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SafeImage } from "@/components/ui/SafeImage";
 import { CartItem as CartItemType } from "@/types/cart";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/formatPrice";
@@ -24,15 +25,13 @@ const CartItem = ({ item, index }: CartItemProps) => {
     >
       {/* Product Image */}
       <div className="w-20 h-20 rounded-lg overflow-hidden bg-greige flex-shrink-0 flex items-center justify-center">
-        {item.image_url ? (
-          <img
-            src={item.image_url}
-            alt={item.name}
-            className="w-full h-full object-contain p-2"
-          />
-        ) : (
-          <span className="text-2xl opacity-40">🔧</span>
-        )}
+        <SafeImage
+          src={item.image_url}
+          alt={item.name}
+          className="w-full h-full object-contain p-2"
+          containerClassName="w-full h-full"
+          fallback={<span className="text-2xl opacity-40">🔧</span>}
+        />
       </div>
 
       {/* Content */}

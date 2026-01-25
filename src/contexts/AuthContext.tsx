@@ -212,10 +212,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setProfile(null);
+    console.log('[Auth] 🚪 Déconnexion en cours...');
+    try {
+      // Clear React Query cache BEFORE signout to prevent stale data
+      queryClient.clear();
+      console.log('[Auth] ✅ Cache cleared');
+      
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+      console.log('[Auth] ✅ Supabase signOut successful');
+      
+      // Clear local state
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      console.log('[Auth] ✅ Local state cleared');
+    } catch (error) {
+      console.error('[Auth] ❌ SignOut error:', error);
+      // Force clear state even on error
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      queryClient.clear();
+    }
   };
 
   const signInWithGoogle = async () => {
