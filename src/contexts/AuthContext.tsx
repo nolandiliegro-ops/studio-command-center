@@ -21,6 +21,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -292,6 +293,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    const redirectUrl = `${window.location.origin}/reset-password`;
+    
+    console.log('[Auth] 📧 Envoi email reset vers:', email);
+    console.log('[Auth] 📧 Redirect URL:', redirectUrl);
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
+    });
+    
+    if (error) {
+      console.error('[Auth] ❌ Erreur reset password:', error.message);
+    } else {
+      console.log('[Auth] ✅ Email de reset envoyé');
+    }
+    
+    return { error };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -304,6 +324,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         signInWithGoogle,
         signOut,
         refreshProfile,
+        resetPassword,
       }}
     >
       {children}

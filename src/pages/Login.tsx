@@ -241,6 +241,14 @@ const Login = () => {
                 {errors.password && (
                   <p className="text-sm text-destructive">{errors.password}</p>
                 )}
+                <div className="flex justify-end pt-1">
+                  <Link 
+                    to="/forgot-password"
+                    className="text-sm text-garage hover:text-garage/80 transition-colors"
+                  >
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
               </div>
 
               <Button
