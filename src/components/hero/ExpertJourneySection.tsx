@@ -51,16 +51,6 @@ const ExpertJourneySection = () => {
 
   return (
     <section className="lg:hidden px-4 pt-0 pb-6 -mt-12 relative z-10">
-      {/* Accroche UX */}
-      <motion.p
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="text-center text-sm text-muted-foreground mb-4 font-medium"
-      >
-        Ne perdez plus de temps avec des pièces incompatibles.
-      </motion.p>
-
       {/* Steps Container */}
       <motion.div
         variants={containerVariants}
@@ -68,6 +58,15 @@ const ExpertJourneySection = () => {
         animate="visible"
         className="bg-white/80 backdrop-blur-2xl rounded-3xl p-5 border-[0.5px] border-white/50 shadow-[0_-8px_30px_rgba(0,0,0,0.08),0_4px_20px_rgba(0,0,0,0.05)]"
       >
+        {/* Hook UX - Monaco Luxury - AVANT les étapes */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="text-center uppercase tracking-[0.2em] text-[10px] sm:text-xs font-medium text-mineral/80 mb-6"
+        >
+          Ne perdez plus de temps avec des pièces incompatibles
+        </motion.p>
         {/* 3 Steps Grid */}
         <div className="grid grid-cols-3 gap-3 mb-5">
           {steps.map((step) => (
