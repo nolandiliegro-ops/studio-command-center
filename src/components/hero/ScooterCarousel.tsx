@@ -169,35 +169,35 @@ const ScooterCarousel = ({
         }}
       />
 
-      {/* Navigation Arrow LEFT - Hidden on mobile */}
+      {/* Navigation Arrow LEFT - Visible on all screens */}
       <motion.div 
-        className="absolute left-8 lg:left-12 xl:left-16 top-1/2 -translate-y-1/2 z-20 hidden lg:block"
+        className="absolute left-1 sm:left-4 lg:left-12 xl:left-16 top-1/2 -translate-y-1/2 z-20"
         whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
+        whileTap={{ scale: 0.9 }}
       >
         <Button
           variant="outline"
           size="icon"
           onClick={scrollPrev}
-          className="rounded-full w-12 h-12 bg-white/90 backdrop-blur-sm border-mineral/20 hover:border-mineral hover:bg-white shadow-lg hover:shadow-xl transition-all"
+          className="rounded-full w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/95 backdrop-blur-sm border-mineral/30 hover:border-mineral hover:bg-white shadow-md hover:shadow-xl transition-all"
         >
-          <ChevronLeft className="w-5 h-5 text-carbon" />
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-carbon" />
         </Button>
       </motion.div>
 
-      {/* Navigation Arrow RIGHT - Hidden on mobile */}
+      {/* Navigation Arrow RIGHT - Visible on all screens */}
       <motion.div 
-        className="absolute right-8 lg:right-12 xl:right-16 top-1/2 -translate-y-1/2 z-20 hidden lg:block"
+        className="absolute right-1 sm:right-4 lg:right-12 xl:right-16 top-1/2 -translate-y-1/2 z-20"
         whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
+        whileTap={{ scale: 0.9 }}
       >
         <Button
           variant="outline"
           size="icon"
           onClick={scrollNext}
-          className="rounded-full w-12 h-12 bg-white/90 backdrop-blur-sm border-mineral/20 hover:border-mineral hover:bg-white shadow-lg hover:shadow-xl transition-all"
+          className="rounded-full w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/95 backdrop-blur-sm border-mineral/30 hover:border-mineral hover:bg-white shadow-md hover:shadow-xl transition-all"
         >
-          <ChevronRight className="w-5 h-5 text-carbon" />
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-carbon" />
         </Button>
       </motion.div>
 
@@ -393,13 +393,19 @@ const ScooterCarousel = ({
               const imageSrc = scooterImages[model.id] || model.image;
 
               return (
-                <div
+                <motion.div
                   key={model.id}
                   className="flex-shrink-0 w-full flex items-center justify-center px-2 lg:px-4"
-                  style={{
-                    transform: `scale(${scale})`,
-                    opacity,
-                    transition: "transform 0.5s ease-out, opacity 0.5s ease-out",
+                  initial={false}
+                  animate={{
+                    scale: scale,
+                    opacity: opacity,
+                    filter: isActive ? "blur(0px)" : "blur(2px)",
+                  }}
+                  transition={{ 
+                    duration: 0.5, 
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                    filter: { duration: 0.3 }
                   }}
                 >
                     {/* Scooter Container - Constrained height on mobile */}
@@ -477,7 +483,7 @@ const ScooterCarousel = ({
 
                     {/* Floating Spec Badges removed - Now in Dashboard bar below */}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
