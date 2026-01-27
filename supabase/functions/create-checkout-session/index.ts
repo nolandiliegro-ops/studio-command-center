@@ -103,6 +103,7 @@ serve(async (req) => {
       subtotalHT += part.price * cartItem.quantity;
 
       // Create Stripe line item with price_data (dynamic pricing)
+      // IMPORTANT: Prices in DB are HT, we send TTC (including 20% VAT) to Stripe
       lineItems.push({
         price_data: {
           currency: "eur",
@@ -110,7 +111,7 @@ serve(async (req) => {
             name: part.name,
             images: part.image_url ? [part.image_url] : [],
           },
-          unit_amount: Math.round(part.price * 100), // Price in cents (HT)
+          unit_amount: Math.round(part.price * (1 + TVA_RATE) * 100), // Price TTC in cents
         },
         quantity: cartItem.quantity,
       });
