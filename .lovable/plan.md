@@ -1,113 +1,79 @@
 
-# Correction de l'Affichage des Prix dans OrderDetailSheet
 
-## Problème Identifié
+# Correction Urgente : TVA Manquante dans le Montant Stripe
 
-Dans le panneau de détails de commande admin, les montants du récapitulatif financier (Sous-total HT, TVA, Livraison, Total TTC) sont tronqués et invisibles sans scroll horizontal. Les prix des articles s'affichent correctement, mais le récapitulatif financier en bas est coupé.
+## Problème Critique Identifié
 
-## Causes du Problème
+Les prix envoyés à Stripe sont en **HT (Hors Taxes)** au lieu de **TTC (Toutes Taxes Comprises)**. Le client est facturé 66.90 € au lieu de 79.30 €, causant une perte de 12.40 € (la TVA) sur chaque commande.
 
-1. **ScrollArea avec padding asymétrique** : Le `pr-4` crée un espace qui pousse le contenu vers la gauche mais les montants à droite sont coupés par la scrollbar
-2. **Structure flex sans contrainte** : Les lignes `justify-between` n'ont pas de `min-w-0` pour empêcher le débordement
-3. **Montants sans `text-right` ou `shrink-0`** : Les spans des prix peuvent être compressés
+## Analyse Technique
+
+Dans `create-checkout-session/index.ts`, ligne 113 :
+
+```typescript
+unit_amount: Math.round(part.price * 100), // Price in cents (HT)
+```
+
+Les prix de la base de données sont stockés en HT, mais ils sont envoyés tels quels à Stripe sans appliquer la TVA de 20%.
 
 ## Solution
 
-Restructurer le récapitulatif financier avec une meilleure gestion de la largeur et ajouter des contraintes pour éviter le débordement.
+Modifier la fonction `create-checkout-session` pour envoyer les prix TTC à Stripe :
 
-## Modifications à Apporter
+1. **Produits** : Multiplier chaque prix par 1.20 (TVA 20%)
+2. **Livraison** : Reste inchangée (déjà TTC)
 
-### Fichier : `src/components/admin/OrderDetailSheet.tsx`
+## Fichier à Modifier
 
-**Changement 1 - ScrollArea (ligne 182)**
+**`supabase/functions/create-checkout-session/index.ts`**
 
-Ajuster le padding pour éviter le conflit avec la scrollbar :
+### Changement 1 - Prix des produits (ligne 113)
+
 ```typescript
 // AVANT
-<ScrollArea className="h-[calc(100vh-180px)] pr-4">
+unit_amount: Math.round(part.price * 100), // Price in cents (HT)
 
-// APRÈS  
-<ScrollArea className="h-[calc(100vh-180px)]">
-  <div className="pr-4">
+// APRÈS
+unit_amount: Math.round(part.price * (1 + TVA_RATE) * 100), // Price in cents (TTC with 20% VAT)
 ```
 
-**Changement 2 - Récapitulatif financier (lignes 352-385)**
+### Changement 2 - Ajouter un commentaire explicatif (ligne 106-116)
 
-Restructurer avec des contraintes de largeur explicites :
 ```typescript
-// Wrapper du récapitulatif avec contrainte de largeur
-<div className="space-y-3 pt-4 border-t border-border/20 w-full">
-  
-  {/* Sous-total HT */}
-  <div className="flex justify-between items-center text-sm w-full">
-    <span className="text-muted-foreground flex-shrink-0">Sous-total HT</span>
-    <span className="text-foreground font-medium text-right flex-shrink-0">
-      {formatPrice(order.subtotal_ht)}
-    </span>
-  </div>
-  
-  {/* TVA */}
-  <div className="flex justify-between items-center text-sm w-full">
-    <span className="text-muted-foreground flex-shrink-0">TVA (20%)</span>
-    <span className="text-foreground font-medium text-right flex-shrink-0">
-      {formatPrice(order.tva_amount)}
-    </span>
-  </div>
-  
-  {/* Livraison - toujours afficher */}
-  <div className="flex justify-between items-center text-sm w-full">
-    <span className="text-muted-foreground flex-shrink-0">
-      Livraison {order.delivery_method ? `(${deliveryMethodConfig[order.delivery_method]?.label || order.delivery_method})` : ''}
-    </span>
-    <span className="text-foreground font-medium text-right flex-shrink-0">
-      {order.delivery_price && order.delivery_price > 0 
-        ? formatPrice(order.delivery_price) 
-        : order.delivery_price === 0 
-          ? <span className="text-green-500">Gratuit</span>
-          : '—'}
-    </span>
-  </div>
-  
-  {/* Séparateur */}
-  <div className="h-px bg-border/30 my-2" />
-  
-  {/* Total TTC - style premium */}
-  <div className="flex justify-between items-baseline w-full">
-    <span className="font-semibold text-foreground">Total TTC</span>
-    <span className="text-2xl font-bold text-primary">
-      {formatPrice(order.total_ttc)}
-    </span>
-  </div>
-</div>
+// Create Stripe line item with price_data (dynamic pricing)
+// IMPORTANT: Prices are sent TTC (including 20% VAT) to Stripe
+lineItems.push({
+  price_data: {
+    currency: "eur",
+    product_data: {
+      name: part.name,
+      images: part.image_url ? [part.image_url] : [],
+    },
+    unit_amount: Math.round(part.price * (1 + TVA_RATE) * 100), // Price TTC in cents
+  },
+  quantity: cartItem.quantity,
+});
 ```
 
-**Changement 3 - Affichage Livraison conditionnel amélioré**
+## Vérification Post-Déploiement
 
-Toujours afficher la ligne "Livraison" dans le récapitulatif (même si 0€ ou non définie) pour une meilleure clarté, avec le type entre parenthèses si disponible.
+Après le déploiement, pour la commande test :
 
-## Résultat Attendu
+| Article | Prix HT | Prix TTC (×1.20) |
+|---------|---------|------------------|
+| Pneu 10×2.75-6.5 | 35.00 € | 42.00 € |
+| Chambre à Air | 12.00 € | 14.40 € |
+| Disque de Frein | 15.00 € | 18.00 € |
+| **Sous-total** | 62.00 € | **74.40 €** |
+| Livraison Standard | — | 4.90 € |
+| **Total Stripe** | — | **79.30 €** ✓ |
 
-Après correction, le panneau affichera clairement :
+## Impact
 
-```
-┌────────────────────────────────────────┐
-│ Sous-total HT                  27.00 € │
-│ TVA (20%)                       5.40 € │
-│ Livraison (Express 24-48h)      9.90 € │
-│ ────────────────────────────────────── │
-│ Total TTC                      42.30 € │
-└────────────────────────────────────────┘
-```
+- **Avant** : Client paie 66.90 € (perte de 12.40 € de TVA par commande)
+- **Après** : Client paie 79.30 € (montant correct TTC)
 
-## Fichiers Impactés
+## Déploiement
 
-| Fichier | Action |
-|---------|--------|
-| `src/components/admin/OrderDetailSheet.tsx` | Modifier structure ScrollArea et récapitulatif |
+La fonction Edge sera automatiquement redéployée après modification.
 
-## Validation
-
-1. Ouvrir le panneau de détails d'une commande
-2. Vérifier que tous les montants sont visibles sans scroll horizontal
-3. Vérifier sur mobile que le panneau est scrollable verticalement
-4. Confirmer que les prix s'affichent dans le format français (X.XX €)
