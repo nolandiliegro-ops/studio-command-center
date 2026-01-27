@@ -4,17 +4,19 @@
 
 ## Résumé
 
-Les animations actuelles sont trop subtiles. Ce plan amplifie significativement toutes les animations pour un effet visuel beaucoup plus impressionnant et dynamique.
+Ce plan intensifie considérablement les animations du carrousel de la Hero Section pour un effet visuel beaucoup plus impressionnant et dynamique. Toutes les animations seront amplifiées : transitions plus longues, mouvements plus grands, effets plus visibles.
 
-## Modifications Détaillées
+## Fichier à Modifier
 
-### Fichier : `src/components/hero/ScooterCarousel.tsx`
+`src/components/hero/ScooterCarousel.tsx`
 
 ---
 
-### 1. Transitions Entre Slides - Plus Longues et Visibles
+## Modifications Détaillées
 
-**Lignes 59-62** : Modifier `premiumTransition`
+### 1. Transition Premium Plus Longue (Lignes 59-62)
+
+**Objectif** : Augmenter la durée à 1 seconde avec une courbe plus fluide
 
 ```typescript
 // AVANT
@@ -23,18 +25,18 @@ const premiumTransition = {
   ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
 };
 
-// APRÈS - Durée 1s, effet plus dramatique
+// APRÈS
 const premiumTransition = {
   duration: 1,
-  ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number], // easeOutQuart - plus fluide
+  ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number], // easeOutQuart
 };
 ```
 
 ---
 
-### 2. Animations Stagger des Specs - Plus Visibles
+### 2. Animations Stagger des Specs Amplifiées (Lignes 29-56)
 
-**Lignes 29-56** : Modifier les variants avec slide de 80px et bounce très visible
+**Objectif** : Slide de 80px, délai de 0.2s entre chaque, bounce très visible
 
 ```typescript
 // AVANT
@@ -57,14 +59,14 @@ const specItemVariants = {
   }
 };
 
-// APRÈS - Slide de 80px, délai de 0.2s entre chaque, bounce TRÈS visible
+// APRÈS
 const specsContainerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2, // 0.2s entre chaque (au lieu de 0.1s)
-      delayChildren: 0.4,   // Délai initial plus long
+      staggerChildren: 0.2,  // 0.2s entre chaque
+      delayChildren: 0.4,    // Délai initial plus long
     }
   }
 };
@@ -72,8 +74,8 @@ const specsContainerVariants = {
 const specItemVariants = {
   hidden: { 
     opacity: 0, 
-    x: 80,        // 80px au lieu de 20px - TRÈS visible
-    scale: 0.8    // Plus petit pour effet plus dramatique
+    x: 80,      // 80px au lieu de 20px - TRÈS visible
+    scale: 0.8  // Plus petit pour effet dramatique
   },
   visible: { 
     opacity: 1, 
@@ -81,9 +83,9 @@ const specItemVariants = {
     scale: 1,
     transition: {
       type: "spring" as const,
-      damping: 8,       // Moins amorti = plus de bounce (au lieu de 15)
-      stiffness: 120,   // Moins rigide = bounce plus long (au lieu de 200)
-      mass: 1.2,        // Plus lourd = effet de rebond plus visible
+      damping: 8,       // Moins amorti = plus de bounce
+      stiffness: 120,   // Moins rigide = bounce plus long
+      mass: 1.2,        // Plus lourd = rebond visible
     }
   }
 };
@@ -91,55 +93,62 @@ const specItemVariants = {
 
 ---
 
-### 3. Effet Parallax Scooter - Déplacement de 100px
+### 3. Indicateur de Progression Circulaire Agrandi (Lignes 74-106)
 
-**Lignes 574-589** (Container) et **Lignes 611-626** (Image) : Amplifier le parallax
+**Objectif** : Cercle plus grand, strokeWidth plus épais, glow effect
 
 ```typescript
-// Container - Lignes 574-589
-initial={{ 
-  opacity: 0, 
-  scale: 0.9,                                    // Plus petit (0.9 au lieu de 0.95)
-  x: slideDirection === 'right' ? 100 : -100     // 100px au lieu de 60px
-}}
-animate={{ 
-  opacity: 1, 
-  scale: 1,
-  x: 0
-}}
-exit={{ 
-  opacity: 0, 
-  scale: 0.9,
-  x: slideDirection === 'right' ? -80 : 80      // 80px au lieu de 40px
-}}
+// AVANT
+<div className="relative w-8 h-8 lg:w-10 lg:h-10">
+  ...
+  strokeWidth="2"
+  ...
+  <Play className="w-3 h-3 lg:w-4 lg:h-4 text-mineral" />
+  <Pause className="w-3 h-3 lg:w-4 lg:h-4 text-mineral/50" />
 
-// Image avec parallax - Lignes 611-626
-initial={{ 
-  x: slideDirection === 'right' ? 150 : -150,   // 150px au lieu de 80px
-  opacity: 0,
-  scale: 0.95                                    // Ajout scale
-}}
-animate={{ 
-  x: 0,
-  opacity: 1,
-  scale: 1
-}}
-exit={{ 
-  x: slideDirection === 'right' ? -100 : 100,   // 100px au lieu de 50px
-  opacity: 0,
-  scale: 0.95
-}}
-transition={{ 
-  duration: 1.2,                                 // Plus lent que container = PARALLAX
-  ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number]
-}}
+// APRÈS
+<div className="relative w-10 h-10 lg:w-14 lg:h-14">
+  ...
+  strokeWidth="3"
+  // Ajouter filter glow sur le cercle animé
+  style={{ 
+    transformOrigin: "center",
+    filter: "drop-shadow(0 0 6px hsl(var(--mineral) / 0.8))"
+  }}
+  ...
+  <Play className="w-4 h-4 lg:w-5 lg:h-5 text-mineral" />
+  <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-mineral/60" />
 ```
 
 ---
 
-### 4. Indicateurs de Navigation - Scale 1.5x et Glow Intense
+### 4. Flèches de Navigation Amplifiées (Lignes 289-302, 305-318)
 
-**Lignes 482-502** : Amplifier hover et glow
+**Objectif** : Scale 1.2x au hover, rotation subtile, glow effect
+
+```typescript
+// AVANT
+whileHover={{ scale: 1.1 }}
+whileTap={{ scale: 0.9 }}
+
+// APRÈS
+whileHover={{ 
+  scale: 1.2, 
+  rotate: -5,
+  boxShadow: "0 8px 25px rgba(147,181,161,0.4)"
+}}
+whileTap={{ 
+  scale: 0.85,
+  rotate: 0
+}}
+transition={{ type: "spring", stiffness: 400, damping: 17 }}
+```
+
+---
+
+### 5. Indicateurs de Navigation (Dots) Amplifiés (Lignes 482-501)
+
+**Objectif** : Scale 1.5x au hover, double glow effect très visible
 
 ```typescript
 // AVANT
@@ -152,14 +161,14 @@ animate={{
 }}
 transition={{ duration: 0.3 }}
 
-// APRÈS - Scale 1.5x, glow TRÈS visible
-whileHover={{ scale: 1.5 }}    // 1.5 au lieu de 1.2
-whileTap={{ scale: 0.85 }}     // Plus petit au clic
+// APRÈS
+whileHover={{ scale: 1.5 }}
+whileTap={{ scale: 0.85 }}
 animate={{
-  scale: isActive ? 1.1 : 1,   // Actif légèrement plus grand
+  scale: isActive ? 1.1 : 1,
   boxShadow: isActive 
     ? "0 0 30px 8px hsl(var(--mineral) / 0.7), 0 0 60px 16px hsl(var(--mineral) / 0.3)" 
-    : "0 0 0px transparent"    // Double glow - interne + externe
+    : "0 0 0px transparent"
 }}
 transition={{ 
   duration: 0.3,
@@ -171,58 +180,73 @@ transition={{
 
 ---
 
-### 5. Indicateur de Progression Circulaire - Plus Grand et Visible
+### 6. Container Scooter avec Parallax Amplifié (Lignes 574-589)
 
-**Lignes 75-106** : Agrandir le cercle et améliorer le style
+**Objectif** : Déplacement de 100px, scale plus marqué
 
 ```typescript
 // AVANT
-<div className="relative w-8 h-8 lg:w-10 lg:h-10">
+initial={{ 
+  opacity: 0, 
+  scale: 0.95,
+  x: slideDirection === 'right' ? 60 : -60
+}}
+animate={{ opacity: 1, scale: 1, x: 0 }}
+exit={{ 
+  opacity: 0, 
+  scale: 0.95,
+  x: slideDirection === 'right' ? -40 : 40
+}}
 
-// APRÈS - Plus grand
-<div className="relative w-10 h-10 lg:w-14 lg:h-14">
-
-// Modifier strokeWidth et ajouter glow
-<circle
-  ...
-  strokeWidth="3"              // 3 au lieu de 2
-/>
-<motion.circle
-  ...
-  strokeWidth="3"
-  style={{ 
-    transformOrigin: "center",
-    filter: "drop-shadow(0 0 6px hsl(var(--mineral) / 0.8))"  // Glow effect
-  }}
-/>
-
-// Icons plus grands
-<Play className="w-4 h-4 lg:w-5 lg:h-5 text-mineral" />      // Plus grand
-<Pause className="w-4 h-4 lg:w-5 lg:h-5 text-mineral/60" />  // Plus grand + plus visible
+// APRÈS
+initial={{ 
+  opacity: 0, 
+  scale: 0.9,                                    // 0.9 au lieu de 0.95
+  x: slideDirection === 'right' ? 100 : -100    // 100px au lieu de 60px
+}}
+animate={{ opacity: 1, scale: 1, x: 0 }}
+exit={{ 
+  opacity: 0, 
+  scale: 0.9,
+  x: slideDirection === 'right' ? -80 : 80      // 80px au lieu de 40px
+}}
 ```
 
 ---
 
-### 6. Flèches de Navigation - Plus Réactives
+### 7. Image Scooter avec Parallax Amplifié (Lignes 611-626)
 
-**Lignes 289-302 et 305-318** : Amplifier les animations des flèches
+**Objectif** : Déplacement de 150px, ajout scale, transition plus lente (parallax)
 
 ```typescript
 // AVANT
-whileHover={{ scale: 1.1 }}
-whileTap={{ scale: 0.9 }}
+initial={{ 
+  x: slideDirection === 'right' ? 80 : -80,
+  opacity: 0 
+}}
+animate={{ x: 0, opacity: 1 }}
+exit={{ 
+  x: slideDirection === 'right' ? -50 : 50,
+  opacity: 0 
+}}
+transition={{ duration: 1, ease: [...] }}
 
-// APRÈS - Plus réactives avec rotation subtile
-whileHover={{ 
-  scale: 1.2, 
-  rotate: -5,                   // Légère rotation
-  boxShadow: "0 8px 25px rgba(147,181,161,0.4)"
+// APRÈS
+initial={{ 
+  x: slideDirection === 'right' ? 150 : -150,   // 150px au lieu de 80px
+  opacity: 0,
+  scale: 0.95
 }}
-whileTap={{ 
-  scale: 0.85,
-  rotate: 0
+animate={{ x: 0, opacity: 1, scale: 1 }}
+exit={{ 
+  x: slideDirection === 'right' ? -100 : 100,   // 100px au lieu de 50px
+  opacity: 0,
+  scale: 0.95
 }}
-transition={{ type: "spring", stiffness: 400, damping: 17 }}
+transition={{ 
+  duration: 1.2,                                 // Plus lent = PARALLAX
+  ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number]
+}}
 ```
 
 ---
@@ -231,21 +255,25 @@ transition={{ type: "spring", stiffness: 400, damping: 17 }}
 
 | Élément | Avant | Après |
 |---------|-------|-------|
-| Transition slide | 0.8s | **1s** |
-| Slide distance (container) | 60px | **100px** |
-| Slide distance (image/parallax) | 80px | **150px** |
+| Durée transition slide | 0.8s | **1s** |
+| Distance slide container | 60px | **100px** |
+| Distance slide image (parallax) | 80px | **150px** |
 | Stagger delay specs | 0.1s | **0.2s** |
 | Slide specs | 20px | **80px** |
 | Spring damping (bounce) | 15 | **8** (plus de rebond) |
+| Spring stiffness | 200 | **120** (plus souple) |
 | Nav dots hover scale | 1.2x | **1.5x** |
 | Nav dots glow | 20px simple | **30px + 60px double** |
 | Cercle progression | w-10/h-10 | **w-14/h-14** |
+| strokeWidth cercle | 2 | **3** |
+
+---
 
 ## Résultat Attendu
 
-1. **Transitions dramatiques** : Les slides glissent sur 100px avec un fondu visible
-2. **Parallax marqué** : L'image de la trottinette glisse 50% plus lentement que le container
-3. **Specs en cascade** : Chaque spec arrive avec 0.2s de décalage et un bounce très visible
-4. **Navigation réactive** : Les dots grossissent de 50% au survol avec double glow
-5. **Progression visible** : Cercle plus grand avec effet lumineux
+1. **Transitions dramatiques** : Les slides glissent sur 100px avec un fondu visible pendant 1 seconde
+2. **Parallax marqué** : L'image de la trottinette glisse 50% plus lentement que le container (1.2s vs 1s)
+3. **Specs en cascade** : Chaque spec (V, Ah, W) arrive avec 0.2s de décalage et un bounce très visible
+4. **Navigation réactive** : Les dots grossissent de 50% au survol avec double glow Mineral Green
+5. **Progression visible** : Cercle plus grand avec effet lumineux et icônes plus grandes
 
