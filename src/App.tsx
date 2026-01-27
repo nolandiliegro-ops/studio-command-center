@@ -31,7 +31,8 @@ import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+function App() {
+  return (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
@@ -84,6 +85,7 @@ const App = () => (
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
-);
+  );
+}
 
 export default App;
