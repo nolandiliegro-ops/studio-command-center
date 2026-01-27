@@ -1,279 +1,348 @@
 
 
-# Amplification des Animations du Carrousel Scooter
+# Amélioration Typographie & Détails Premium "Studio"
 
 ## Résumé
 
-Ce plan intensifie considérablement les animations du carrousel de la Hero Section pour un effet visuel beaucoup plus impressionnant et dynamique. Toutes les animations seront amplifiées : transitions plus longues, mouvements plus grands, effets plus visibles.
+Ce plan améliore la typographie et les détails visuels pour un rendu plus luxueux et "Studio", incluant le slogan avec gradient, les titres de sections avec underline animé, les prix agrandis et les badges glassmorphism.
 
-## Fichier à Modifier
+---
 
-`src/components/hero/ScooterCarousel.tsx`
+## Fichiers à Modifier
+
+| Fichier | Modification |
+|---------|-------------|
+| `src/pages/Index.tsx` | Slogan "ROULE RÉPARE DURE" premium |
+| `src/components/hero/HeroBranding.tsx` | Titres H1 avec gradient et style automotive |
+| `src/components/parts/PartCard.tsx` | Prix agrandis + hover scale |
+| `src/components/pepites/FeaturedPartCard.tsx` | Badges glassmorphism + pulse |
+| `src/pages/Catalogue.tsx` | Titre section avec underline animé |
+| `src/pages/Pepites.tsx` | Titre section avec underline animé |
+| `src/index.css` | Nouvelles classes utilitaires |
 
 ---
 
 ## Modifications Détaillées
 
-### 1. Transition Premium Plus Longue (Lignes 59-62)
+### 1. Slogan "ROULE RÉPARE DURE" - Index.tsx (Lignes 73-92)
 
-**Objectif** : Augmenter la durée à 1 seconde avec une courbe plus fluide
+**Style actuel** : Pill simple avec fond blanc et couleur Mineral Green statique
+
+**Nouveau style** :
+- font-weight: 800 (extra-bold)
+- letter-spacing: -0.02em (style automotive serré)
+- line-height: 0.9 (compact)
+- Gradient texte Carbon Black → Mineral Green
+- Animation fade-in 0.8s
 
 ```typescript
-// AVANT
-const premiumTransition = {
-  duration: 0.8,
-  ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-};
-
 // APRÈS
-const premiumTransition = {
-  duration: 1,
-  ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number], // easeOutQuart
-};
+<motion.div
+  className="fixed bottom-4 lg:bottom-8 left-4 lg:left-8 z-50"
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+>
+  <div 
+    className="px-4 py-2 lg:px-6 lg:py-3 rounded-full font-display text-sm lg:text-lg"
+    style={{
+      background: "rgba(255,255,255,0.9)",
+      backdropFilter: "blur(12px)",
+      border: "1px solid rgba(147,181,161,0.3)",
+      boxShadow: "0 4px 20px rgba(147,181,161,0.2)",
+      fontWeight: 800,
+      letterSpacing: "-0.02em",
+      lineHeight: 0.9,
+    }}
+  >
+    <span
+      style={{
+        background: "linear-gradient(135deg, #1A1A1A 0%, #93B5A1 100%)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+      }}
+    >
+      ROULE RÉPARE DURE
+    </span>
+  </div>
+</motion.div>
 ```
 
 ---
 
-### 2. Animations Stagger des Specs Amplifiées (Lignes 29-56)
+### 2. CSS Utilitaires - index.css (Ajouter à @layer utilities)
 
-**Objectif** : Slide de 80px, délai de 0.2s entre chaque, bounce très visible
+**Nouvelles classes pour underline animé et effets premium** :
 
-```typescript
-// AVANT
-const specsContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.3,
-    }
-  }
-};
+```css
+/* Underline animé Mineral Green */
+.title-underline-animated {
+  position: relative;
+  display: inline-block;
+}
 
-const specItemVariants = {
-  hidden: { opacity: 0, x: 20, scale: 0.95 },
-  visible: { 
-    opacity: 1, x: 0, scale: 1,
-    transition: { type: "spring" as const, damping: 15, stiffness: 200 }
-  }
-};
+.title-underline-animated::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: hsl(var(--mineral));
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease-out;
+}
 
-// APRÈS
-const specsContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,  // 0.2s entre chaque
-      delayChildren: 0.4,    // Délai initial plus long
-    }
-  }
-};
+.title-underline-animated:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
 
-const specItemVariants = {
-  hidden: { 
-    opacity: 0, 
-    x: 80,      // 80px au lieu de 20px - TRÈS visible
-    scale: 0.8  // Plus petit pour effet dramatique
-  },
-  visible: { 
-    opacity: 1, 
-    x: 0,
-    scale: 1,
-    transition: {
-      type: "spring" as const,
-      damping: 8,       // Moins amorti = plus de bounce
-      stiffness: 120,   // Moins rigide = bounce plus long
-      mass: 1.2,        // Plus lourd = rebond visible
-    }
-  }
-};
+/* Gradient text Carbon to Mineral */
+.text-gradient-carbon-mineral {
+  background: linear-gradient(135deg, hsl(var(--carbon)) 0%, hsl(var(--mineral)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Prix hover scale */
+.price-hover:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-out;
+}
 ```
 
 ---
 
-### 3. Indicateur de Progression Circulaire Agrandi (Lignes 74-106)
+### 3. Titres de Sections - Catalogue.tsx (Lignes 207-214)
 
-**Objectif** : Cercle plus grand, strokeWidth plus épais, glow effect
+**Style actuel** : Titre simple sans effet hover
+
+**Nouveau style** :
+- font-weight: 700
+- letter-spacing: -0.01em
+- Classe `title-underline-animated` pour underline au hover
 
 ```typescript
 // AVANT
-<div className="relative w-8 h-8 lg:w-10 lg:h-10">
-  ...
-  strokeWidth="2"
-  ...
-  <Play className="w-3 h-3 lg:w-4 lg:h-4 text-mineral" />
-  <Pause className="w-3 h-3 lg:w-4 lg:h-4 text-mineral/50" />
+<motion.h1
+  className="font-display text-5xl md:text-6xl lg:text-7xl text-carbon tracking-[0.2em] uppercase"
+>
+  CATALOGUE
+</motion.h1>
 
 // APRÈS
-<div className="relative w-10 h-10 lg:w-14 lg:h-14">
-  ...
-  strokeWidth="3"
-  // Ajouter filter glow sur le cercle animé
-  style={{ 
-    transformOrigin: "center",
-    filter: "drop-shadow(0 0 6px hsl(var(--mineral) / 0.8))"
+<motion.h1
+  className="font-display text-5xl md:text-6xl lg:text-7xl text-carbon uppercase cursor-pointer title-underline-animated"
+  style={{
+    fontWeight: 700,
+    letterSpacing: "-0.01em",
   }}
-  ...
-  <Play className="w-4 h-4 lg:w-5 lg:h-5 text-mineral" />
-  <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-mineral/60" />
+>
+  CATALOGUE
+</motion.h1>
 ```
 
 ---
 
-### 4. Flèches de Navigation Amplifiées (Lignes 289-302, 305-318)
+### 4. Titres de Sections - Pepites.tsx (Lignes 69-76)
 
-**Objectif** : Scale 1.2x au hover, rotation subtile, glow effect
+**Même traitement que Catalogue** :
+
+```typescript
+// APRÈS
+<motion.h1
+  className="font-display text-5xl md:text-7xl lg:text-8xl text-carbon mb-6 cursor-pointer title-underline-animated"
+  style={{
+    fontWeight: 700,
+    letterSpacing: "-0.01em",
+  }}
+>
+  LES PÉPITES
+</motion.h1>
+```
+
+---
+
+### 5. Prix Produits - PartCard.tsx (Lignes 269-278)
+
+**Style actuel** : `text-2xl font-light`
+
+**Nouveau style** :
+- font-size: 1.5rem (text-2xl → text-[1.5rem])
+- font-weight: 600 (semi-bold)
+- Animation scale(1.05) au hover via motion
 
 ```typescript
 // AVANT
-whileHover={{ scale: 1.1 }}
-whileTap={{ scale: 0.9 }}
+<span className={cn(
+  "text-2xl font-light tracking-wide",
+  isOutOfStock ? "text-muted-foreground" : "text-mineral"
+)}>
+  {formatPrice(part.price)}
+</span>
 
 // APRÈS
-whileHover={{ 
-  scale: 1.2, 
-  rotate: -5,
-  boxShadow: "0 8px 25px rgba(147,181,161,0.4)"
-}}
-whileTap={{ 
-  scale: 0.85,
-  rotate: 0
-}}
-transition={{ type: "spring", stiffness: 400, damping: 17 }}
+<motion.span 
+  whileHover={{ scale: 1.05 }}
+  transition={{ duration: 0.2 }}
+  className={cn(
+    "text-[1.5rem] font-semibold tracking-wide inline-block",
+    isOutOfStock ? "text-muted-foreground" : "text-mineral"
+  )}
+>
+  {formatPrice(part.price)}
+</motion.span>
 ```
 
 ---
 
-### 5. Indicateurs de Navigation (Dots) Amplifiés (Lignes 482-501)
+### 6. Badge COMPATIBLE - PartCard.tsx (Lignes 168-175)
 
-**Objectif** : Scale 1.5x au hover, double glow effect très visible
+**Style actuel** : Fond dynamique basé sur la marque
+
+**Nouveau style glassmorphism** :
+- background: rgba(147, 181, 161, 0.8) pour Mineral Green par défaut
+- backdrop-filter: blur(10px)
+- border: 1px solid rgba(255, 255, 255, 0.3)
+- Animation pulse au hover (scale 1.05)
+
+```typescript
+// Lignes 155-175 - Modifier le motion.div interne
+<motion.div 
+  animate={{ 
+    boxShadow: [
+      `0 0 8px ${selectedBrandColors.glowColor}`,
+      `0 0 16px ${selectedBrandColors.glowColor}`,
+      `0 0 8px ${selectedBrandColors.glowColor}`,
+    ]
+  }}
+  whileHover={{ scale: 1.05 }}
+  transition={{ 
+    duration: 2, 
+    repeat: Infinity, 
+    ease: "easeInOut" 
+  }}
+  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-semibold tracking-wide uppercase"
+  style={{
+    background: "rgba(147, 181, 161, 0.8)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+  }}
+>
+```
+
+---
+
+### 7. Badge SÉLECTION EXPERT - PartCard.tsx (Lignes 199-210)
+
+**Style actuel** : `bg-carbon` avec border simple
+
+**Nouveau style glassmorphism** :
 
 ```typescript
 // AVANT
-whileHover={{ scale: 1.2 }}
-whileTap={{ scale: 0.9 }}
-animate={{
-  boxShadow: isActive 
-    ? "0 0 20px hsl(var(--mineral) / 0.6)" 
-    : "0 0 0px transparent"
-}}
-transition={{ duration: 0.3 }}
+<div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-carbon text-white text-[10px] font-medium tracking-widest uppercase shadow-lg backdrop-blur-sm border border-white/10">
 
 // APRÈS
-whileHover={{ scale: 1.5 }}
-whileTap={{ scale: 0.85 }}
-animate={{
-  scale: isActive ? 1.1 : 1,
-  boxShadow: isActive 
-    ? "0 0 30px 8px hsl(var(--mineral) / 0.7), 0 0 60px 16px hsl(var(--mineral) / 0.3)" 
-    : "0 0 0px transparent"
-}}
-transition={{ 
-  duration: 0.3,
-  type: "spring",
-  stiffness: 300,
-  damping: 15
-}}
+<motion.div 
+  whileHover={{ scale: 1.05 }}
+  transition={{ duration: 0.2 }}
+  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-[10px] font-medium tracking-widest uppercase"
+  style={{
+    background: "rgba(26, 26, 26, 0.85)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+    boxShadow: "0 4px 16px rgba(26, 26, 26, 0.2)",
+  }}
+>
 ```
 
 ---
 
-### 6. Container Scooter avec Parallax Amplifié (Lignes 574-589)
+### 8. Badge COUP DE CŒUR - FeaturedPartCard.tsx (Lignes 72-79)
 
-**Objectif** : Déplacement de 100px, scale plus marqué
+**Style actuel** : `bg-mineral` solid
+
+**Nouveau style glassmorphism** :
 
 ```typescript
 // AVANT
-initial={{ 
-  opacity: 0, 
-  scale: 0.95,
-  x: slideDirection === 'right' ? 60 : -60
-}}
-animate={{ opacity: 1, scale: 1, x: 0 }}
-exit={{ 
-  opacity: 0, 
-  scale: 0.95,
-  x: slideDirection === 'right' ? -40 : 40
-}}
+<div className="relative flex items-center gap-2 px-3 py-2 bg-mineral text-white rounded-xl overflow-hidden">
 
 // APRÈS
-initial={{ 
-  opacity: 0, 
-  scale: 0.9,                                    // 0.9 au lieu de 0.95
-  x: slideDirection === 'right' ? 100 : -100    // 100px au lieu de 60px
-}}
-animate={{ opacity: 1, scale: 1, x: 0 }}
-exit={{ 
-  opacity: 0, 
-  scale: 0.9,
-  x: slideDirection === 'right' ? -80 : 80      // 80px au lieu de 40px
-}}
+<motion.div 
+  whileHover={{ scale: 1.05 }}
+  transition={{ duration: 0.2 }}
+  className="relative flex items-center gap-2 px-3 py-2 text-white rounded-xl overflow-hidden"
+  style={{
+    background: "rgba(147, 181, 161, 0.8)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+    boxShadow: "0 4px 16px rgba(147, 181, 161, 0.3)",
+  }}
+>
 ```
 
 ---
 
-### 7. Image Scooter avec Parallax Amplifié (Lignes 611-626)
+### 9. Prix Monumental - FeaturedPartCard.tsx (Lignes 120-125)
 
-**Objectif** : Déplacement de 150px, ajout scale, transition plus lente (parallax)
+**Style actuel** : `font-display text-4xl text-mineral`
+
+**Nouveau style** :
 
 ```typescript
 // AVANT
-initial={{ 
-  x: slideDirection === 'right' ? 80 : -80,
-  opacity: 0 
-}}
-animate={{ x: 0, opacity: 1 }}
-exit={{ 
-  x: slideDirection === 'right' ? -50 : 50,
-  opacity: 0 
-}}
-transition={{ duration: 1, ease: [...] }}
+<span className="font-display text-4xl text-mineral tracking-wide">
+  {formatPrice(part.price || 0)}
+</span>
 
 // APRÈS
-initial={{ 
-  x: slideDirection === 'right' ? 150 : -150,   // 150px au lieu de 80px
-  opacity: 0,
-  scale: 0.95
-}}
-animate={{ x: 0, opacity: 1, scale: 1 }}
-exit={{ 
-  x: slideDirection === 'right' ? -100 : 100,   // 100px au lieu de 50px
-  opacity: 0,
-  scale: 0.95
-}}
-transition={{ 
-  duration: 1.2,                                 // Plus lent = PARALLAX
-  ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number]
-}}
+<motion.span 
+  whileHover={{ scale: 1.05 }}
+  transition={{ duration: 0.2 }}
+  className="font-display text-[2rem] text-mineral tracking-wide inline-block"
+  style={{
+    fontWeight: 600,
+  }}
+>
+  {formatPrice(part.price || 0)}
+</motion.span>
 ```
 
 ---
 
-## Résumé des Changements
+## Résumé des Améliorations
 
 | Élément | Avant | Après |
 |---------|-------|-------|
-| Durée transition slide | 0.8s | **1s** |
-| Distance slide container | 60px | **100px** |
-| Distance slide image (parallax) | 80px | **150px** |
-| Stagger delay specs | 0.1s | **0.2s** |
-| Slide specs | 20px | **80px** |
-| Spring damping (bounce) | 15 | **8** (plus de rebond) |
-| Spring stiffness | 200 | **120** (plus souple) |
-| Nav dots hover scale | 1.2x | **1.5x** |
-| Nav dots glow | 20px simple | **30px + 60px double** |
-| Cercle progression | w-10/h-10 | **w-14/h-14** |
-| strokeWidth cercle | 2 | **3** |
+| Slogan font-weight | normal | **800 (extra-bold)** |
+| Slogan letter-spacing | 0.2em | **-0.02em (automotive)** |
+| Slogan texte | Couleur unie | **Gradient Carbon→Mineral** |
+| Slogan animation | 0.6s | **0.8s ease-out** |
+| Titres sections | tracking-[0.2em] | **letter-spacing: -0.01em** |
+| Titres sections hover | Aucun | **Underline animé Mineral 2px** |
+| Prix font-size | text-2xl | **1.5rem** |
+| Prix font-weight | font-light | **font-semibold (600)** |
+| Prix hover | Aucun | **scale(1.05)** |
+| Badges background | Solid | **rgba(..., 0.8) glassmorphism** |
+| Badges backdrop-filter | Aucun | **blur(10px)** |
+| Badges border | Simple | **1px solid rgba(255,255,255,0.3)** |
+| Badges hover | Aucun | **scale(1.05) pulse** |
 
 ---
 
 ## Résultat Attendu
 
-1. **Transitions dramatiques** : Les slides glissent sur 100px avec un fondu visible pendant 1 seconde
-2. **Parallax marqué** : L'image de la trottinette glisse 50% plus lentement que le container (1.2s vs 1s)
-3. **Specs en cascade** : Chaque spec (V, Ah, W) arrive avec 0.2s de décalage et un bounce très visible
-4. **Navigation réactive** : Les dots grossissent de 50% au survol avec double glow Mineral Green
-5. **Progression visible** : Cercle plus grand avec effet lumineux et icônes plus grandes
+1. **Slogan premium** : Typographie serrée style automotive avec gradient élégant
+2. **Titres dynamiques** : Underline animé Mineral Green au survol
+3. **Prix impactants** : Plus grands, plus visibles, avec micro-interaction au hover
+4. **Badges glassmorphism** : Effet verre dépoli cohérent sur tous les badges
 
