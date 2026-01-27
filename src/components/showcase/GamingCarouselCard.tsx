@@ -25,14 +25,14 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
   
   // Dynamic scale and opacity based on position
   const getScale = () => {
-    if (isCenter) return 1.1;
+    if (isCenter) return 1.2;
     if (distanceFromCenter === 1) return 1;
     return 0.95;
   };
   
   const getOpacity = () => {
     if (isCenter) return 1;
-    if (distanceFromCenter === 1) return 0.9;
+    if (distanceFromCenter === 1) return 0.85;
     return 0.7;
   };
 
@@ -54,29 +54,30 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
         scale: getScale(),
       }}
       transition={{ 
-        duration: 0.5, 
+        duration: 0.8, 
         delay: index * 0.05,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
       whileHover={{ 
         y: -12,
         scale: getScale() * 1.02,
-        transition: { duration: 0.3 }
+        transition: { duration: 0.4 }
       }}
       onClick={handleClick}
-      className={`relative cursor-pointer rounded-2xl overflow-hidden ${
-        isCenter ? "gaming-card-center z-10" : ""
+      className={`relative cursor-pointer overflow-hidden ${
+        isCenter ? "gaming-card-center-light z-10" : ""
       }`}
       style={{
-        background: "rgba(26, 26, 26, 0.85)",
+        background: "rgba(255, 255, 255, 0.85)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         border: isCenter 
-          ? "2px solid rgba(147, 181, 161, 0.6)" 
-          : "2px solid rgba(147, 181, 161, 0.25)",
+          ? "2px solid rgba(147, 181, 161, 0.5)" 
+          : "1px solid rgba(147, 181, 161, 0.2)",
+        borderRadius: "20px",
         boxShadow: isCenter 
-          ? "0 12px 40px rgba(147, 181, 161, 0.35), inset 0 1px 0 rgba(255,255,255,0.1)"
-          : "0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
+          ? "0 12px 40px rgba(147, 181, 161, 0.25), 0 8px 32px rgba(26, 26, 26, 0.08)"
+          : "0 8px 32px rgba(26, 26, 26, 0.08)",
       }}
     >
       {/* Spotlight effect for center card */}
@@ -84,7 +85,7 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "radial-gradient(circle at 50% 30%, rgba(147, 181, 161, 0.15) 0%, transparent 60%)",
+            background: "radial-gradient(circle at 50% 30%, rgba(147, 181, 161, 0.1) 0%, transparent 60%)",
           }}
         />
       )}
@@ -92,7 +93,7 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
       {/* Product Image */}
       <div className="relative p-4 md:p-6">
         <motion.div
-          className="relative w-full aspect-square max-w-[200px] mx-auto"
+          className="relative w-full aspect-square max-w-[280px] mx-auto"
           whileHover={{ 
             rotateY: 10,
             scale: 1.05,
@@ -104,7 +105,7 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
           <div 
             className="absolute inset-0 -z-10"
             style={{
-              background: "radial-gradient(circle at 50% 50%, rgba(147, 181, 161, 0.2) 0%, transparent 70%)",
+              background: "radial-gradient(circle at 50% 50%, rgba(147, 181, 161, 0.15) 0%, transparent 70%)",
               filter: "blur(20px)",
               transform: "scale(1.2)",
             }}
@@ -114,12 +115,12 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
             <img
               src={part.image_url}
               alt={part.name}
-              className={`w-full h-full object-contain ${isCenter ? "gaming-product-glow" : ""}`}
+              className={`w-full h-full object-contain ${isCenter ? "gaming-product-glow-light" : ""}`}
               style={{ background: "transparent" }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Package className="w-16 h-16 text-white/20" />
+              <Package className="w-16 h-16 text-carbon/20" />
             </div>
           )}
         </motion.div>
@@ -128,10 +129,7 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
       {/* Product Info */}
       <div className="px-4 pb-5 space-y-3">
         {/* Product Name */}
-        <h3 
-          className="text-white text-sm md:text-base font-semibold line-clamp-2 text-center min-h-[40px]"
-          style={{ textShadow: "0 2px 10px rgba(0,0,0,0.3)" }}
-        >
+        <h3 className="text-carbon text-sm md:text-base font-semibold line-clamp-2 text-center min-h-[40px]">
           {part.name}
         </h3>
 
@@ -142,12 +140,12 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
               key={i} 
               className={`w-3.5 h-3.5 ${
                 i < Math.floor(rating) 
-                  ? "text-yellow-400 fill-yellow-400" 
-                  : "text-white/20"
+                  ? "text-yellow-500 fill-yellow-500" 
+                  : "text-carbon/20"
               }`}
             />
           ))}
-          <span className="text-white/50 text-xs ml-1">({reviewCount})</span>
+          <span className="text-carbon/50 text-xs ml-1">({reviewCount})</span>
         </div>
 
         {/* Price with Glow */}
@@ -157,8 +155,8 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
             style={{
               color: "hsl(var(--mineral))",
               textShadow: isCenter 
-                ? "0 0 20px rgba(147, 181, 161, 0.6)" 
-                : "0 0 10px rgba(147, 181, 161, 0.3)",
+                ? "0 0 15px rgba(147, 181, 161, 0.4)" 
+                : "none",
             }}
           >
             {formatPrice(part.price || 0)}
@@ -173,7 +171,7 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
               background: "rgba(147, 181, 161, 0.15)",
               border: "1px solid rgba(147, 181, 161, 0.4)",
               clipPath: "polygon(8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%, 0% 50%)",
-              boxShadow: "0 0 10px rgba(147, 181, 161, 0.2)",
+              boxShadow: "0 0 10px rgba(147, 181, 161, 0.15)",
             }}
           >
             <ShieldCheck className="w-3.5 h-3.5 text-mineral" />
@@ -195,10 +193,10 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
                   : "0 0 6px rgba(239, 68, 68, 0.6)",
               }}
             />
-            <span className="text-white/50 text-xs">
+            <span className="text-carbon/60 text-xs">
               {part.stock_quantity > 0 ? (
                 <span className="flex items-center gap-1">
-                  <Check className="w-3 h-3 text-green-400" />
+                  <Check className="w-3 h-3 text-green-500" />
                   En stock
                 </span>
               ) : "Rupture"}
@@ -209,12 +207,13 @@ const GamingCarouselCard = ({ part, isCenter, distanceFromCenter, index }: Gamin
 
       {/* Hover Glow Overlay */}
       <motion.div
-        className="absolute inset-0 pointer-events-none rounded-2xl"
+        className="absolute inset-0 pointer-events-none"
         initial={{ opacity: 0 }}
         whileHover={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
         style={{
-          boxShadow: "inset 0 0 30px rgba(147, 181, 161, 0.15)",
+          borderRadius: "20px",
+          boxShadow: "inset 0 0 30px rgba(147, 181, 161, 0.1)",
         }}
       />
     </motion.div>

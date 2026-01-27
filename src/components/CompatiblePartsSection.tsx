@@ -17,7 +17,7 @@ const CompatiblePartsSection = ({
 
   if (!activeModelSlug) {
     return (
-      <div className="container mx-auto px-4 lg:px-8">
+      <div className="w-full px-4 md:px-10 lg:px-20">
         <motion.div
           className="flex flex-col items-center justify-center py-20 text-center"
           initial={{ scale: 0.9, opacity: 0 }}
@@ -37,13 +37,13 @@ const CompatiblePartsSection = ({
   }
 
   return (
-    <div className="container mx-auto px-4 lg:px-8">
+    <div className="w-full">
       {/* Header - Dynamic Call to Value */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="text-center mb-8 lg:mb-12"
+        className="text-center mb-8 lg:mb-12 px-4 md:px-10 lg:px-20"
       >
         {/* Titre Dynamique avec Badge */}
         <div className="flex flex-col lg:flex-row items-center justify-center gap-2 lg:gap-3 mb-3">
@@ -74,7 +74,7 @@ const CompatiblePartsSection = ({
         </div>
       </motion.div>
 
-      {/* Gaming Carousel */}
+      {/* Gaming Carousel - Full Width */}
       <GamingCarousel 
         parts={parts}
         activeModelName={activeModelName}
