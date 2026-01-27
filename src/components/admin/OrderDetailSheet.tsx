@@ -3,16 +3,19 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { 
-  X, 
   User, 
   MapPin, 
   Package, 
   Loader2, 
   Gem,
-  CheckCircle
+  Truck,
+  Zap,
+  MapPin as MapPinIcon,
+  MessageSquare
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/formatPrice";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -47,6 +50,9 @@ type Order = {
   loyalty_points_earned: number;
   status: string;
   created_at: string;
+  delivery_method: string | null;
+  delivery_price: number | null;
+  notes: string | null;
 };
 
 type OrderItem = {
@@ -72,6 +78,33 @@ const statusOptions = [
   { value: "delivered", label: "Livré", color: "bg-green-500" },
   { value: "cancelled", label: "Annulé", color: "bg-red-500" },
 ];
+
+// Delivery method configuration with Studio design (bg-500/15 + text-500)
+const deliveryMethodConfig: Record<string, { 
+  label: string; 
+  colorClass: string;
+  bgClass: string;
+  Icon: React.ElementType;
+}> = {
+  standard: { 
+    label: "Standard (3-5j)", 
+    colorClass: "text-blue-500",
+    bgClass: "bg-blue-500/15",
+    Icon: Package
+  },
+  express: { 
+    label: "Express (24-48h)", 
+    colorClass: "text-orange-500",
+    bgClass: "bg-orange-500/15",
+    Icon: Zap
+  },
+  relay: { 
+    label: "Point Relais", 
+    colorClass: "text-green-500",
+    bgClass: "bg-green-500/15",
+    Icon: MapPinIcon
+  },
+};
 
 const OrderDetailSheet = ({ order, isOpen, onClose, onStatusUpdate }: OrderDetailSheetProps) => {
   const queryClient = useQueryClient();
@@ -208,6 +241,57 @@ const OrderDetailSheet = ({ order, isOpen, onClose, onStatusUpdate }: OrderDetai
               </div>
             </div>
 
+            {/* Delivery Info - Conditional */}
+            {order.delivery_method && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Truck className="w-4 h-4 text-primary" />
+                  Livraison
+                </div>
+                <div className="bg-mineral/10 rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    {(() => {
+                      const config = deliveryMethodConfig[order.delivery_method];
+                      const IconComponent = config?.Icon || Package;
+                      return (
+                        <div className={cn(
+                          "flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium",
+                          config?.bgClass || "bg-muted",
+                          config?.colorClass || "text-foreground"
+                        )}>
+                          <IconComponent className="w-4 h-4" />
+                          {config?.label || order.delivery_method}
+                        </div>
+                      );
+                    })()}
+                    {order.delivery_price !== null && order.delivery_price > 0 && (
+                      <span className="font-semibold text-foreground">
+                        {formatPrice(order.delivery_price)}
+                      </span>
+                    )}
+                    {order.delivery_price === 0 && (
+                      <span className="text-green-500 font-medium">Gratuit</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Customer Notes - Conditional */}
+            {order.notes && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <MessageSquare className="w-4 h-4 text-primary" />
+                  Notes du client
+                </div>
+                <div className="bg-muted/30 rounded-xl p-4">
+                  <p className="text-sm text-foreground italic">
+                    "{order.notes}"
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Order Items */}
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm font-medium text-foreground">
@@ -275,6 +359,12 @@ const OrderDetailSheet = ({ order, isOpen, onClose, onStatusUpdate }: OrderDetai
                 <span className="text-muted-foreground">TVA (20%)</span>
                 <span className="text-foreground">{formatPrice(order.tva_amount)}</span>
               </div>
+              {order.delivery_price !== null && order.delivery_price > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Livraison</span>
+                  <span className="text-foreground">{formatPrice(order.delivery_price)}</span>
+                </div>
+              )}
               <div className="h-px bg-border/20 my-2" />
               <div className="flex justify-between items-baseline">
                 <span className="font-semibold text-foreground">Total TTC</span>
