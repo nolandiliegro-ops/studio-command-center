@@ -146,7 +146,10 @@ const CheckoutPage = () => {
           tva_amount: totals.tva,
           total_ttc: finalTotalTTC,
           loyalty_points_earned: finalLoyaltyPoints,
-          status: 'pending'
+          status: 'pending',
+          delivery_method: deliveryMethod,
+          delivery_price: deliveryPrice,
+          notes: recommendations || null
         })
         .select()
         .single();

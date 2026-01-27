@@ -43,6 +43,9 @@ type Order = {
   loyalty_points_earned: number;
   status: string;
   created_at: string;
+  delivery_method: string | null;
+  delivery_price: number | null;
+  notes: string | null;
 };
 
 // Status Configuration with LED Effect (15% opacity backgrounds)
