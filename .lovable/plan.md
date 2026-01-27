@@ -1,138 +1,118 @@
 
-# Plan d'Implementation du Webhook Stripe
+# Correction du Mapping des Statuts de Paiement
 
-## Objectif
+## Probleme Identifie
 
-Ajouter un webhook Stripe pour gérer les evenements de paiement de maniere asynchrone et securisee. Cela permet de capturer les paiements meme si l'utilisateur ferme son navigateur avant d'arriver sur la page de succes.
+Les Edge Functions `stripe-webhook` et `verify-payment` mettent le statut de commande a `"pending"` apres un paiement reussi. Cependant, dans l'interface admin, `"pending"` est affiche comme "En attente" (couleur orange), ce qui prete a confusion.
 
-## Pourquoi un Webhook ?
+La capture d'ecran montre que :
+- Le webhook retourne `processed: true` avec le bon `orderId`
+- La base de donnees confirme que la commande a bien `paid_at` rempli et `stripe_payment_intent_id` stocke
+- Mais l'admin affiche "En attente" au lieu de "Paye"
 
-Le flux actuel repose sur la page `/payment-success` pour verifier le paiement. Probleme : si l'utilisateur ferme son navigateur apres avoir paye, la commande reste en `awaiting_payment` indefiniment.
+## Cause Racine
 
-Le webhook resout ce probleme en recevant directement les notifications de Stripe, independamment du comportement de l'utilisateur.
+Incoherence entre :
+1. **Edge Functions** : utilisent `status: "pending"` pour signifier "paye, en attente d'expedition"
+2. **Admin UI** : interprete `"pending"` comme "En attente" (non paye) et attend `"paid"` pour afficher "Paye"
 
-## Architecture
+## Solution Recommandee
+
+Modifier les Edge Functions pour utiliser `status: "paid"` au lieu de `status: "pending"` apres un paiement reussi. C'est la solution la plus coherente car :
+- Elle respecte le mapping UI existant
+- Elle utilise un statut explicite (`paid`) pour indiquer le paiement
+- Le flux devient : `awaiting_payment` → `paid` → `processing` → `shipped` → `delivered`
+
+## Fichiers a Modifier
+
+### 1. Edge Function `stripe-webhook`
+
+**Fichier** : `supabase/functions/stripe-webhook/index.ts`
+
+**Modification** : Ligne 94
+
+```typescript
+// AVANT
+status: "pending",
+
+// APRES  
+status: "paid",
+```
+
+### 2. Edge Function `verify-payment`
+
+**Fichier** : `supabase/functions/verify-payment/index.ts`
+
+**Modifications** :
+
+Ligne 62 - Condition de verification :
+```typescript
+// AVANT
+if (order.status === "paid" || order.status === "pending") {
+
+// APRES
+if (order.status === "paid") {
+```
+
+Ligne 95 - Mise a jour du statut :
+```typescript
+// AVANT
+status: "pending", // pending means paid but not shipped
+
+// APRES
+status: "paid", // Payment confirmed
+```
+
+Ligne 150 - Reponse :
+```typescript
+// AVANT
+status: "pending",
+
+// APRES
+status: "paid",
+```
+
+### 3. Aucun Changement Necessaire
+
+- `OrdersManager.tsx` : Le mapping des statuts est deja correct
+- Base de donnees : Aucune migration necessaire
+
+## Flux Apres Correction
 
 ```text
-FLUX ACTUEL (conserve)
-┌─────────────────────────────────────────────────────────────┐
-│  User ─> Stripe Checkout ─> /payment-success ─> verify-payment
-│                                                    │
-│                                              Update order
-│                                              Send email
-└─────────────────────────────────────────────────────────────┘
-
-NOUVEAU FLUX WEBHOOK (backup securise)
-┌─────────────────────────────────────────────────────────────┐
-│  Stripe ─> POST /stripe-webhook ─> Verify signature
-│                                          │
-│                     ┌────────────────────┴────────────────┐
-│                     │                                     │
-│              checkout.session.completed         payment_intent.succeeded
-│                     │                                     │
-│              Update order to "pending"          Backup verification
-│              Send confirmation email
-└─────────────────────────────────────────────────────────────┘
+awaiting_payment  ──(Stripe paye)──>  paid  ──(Admin)──>  processing  ──>  shipped  ──>  delivered
+      │                                 │
+      │                                 └── Affiche "Paye" (vert) dans l'admin
+      │
+      └── Affiche "En attente de paiement" (si on l'ajoute a l'UI)
 ```
 
-## Evenements Stripe a Gerer
+## Verification
 
-| Evenement | Action |
-|-----------|--------|
-| `checkout.session.completed` | Marquer la commande comme payee, envoyer l'email de confirmation |
-| `payment_intent.payment_failed` | Logger l'echec pour le suivi admin (optionnel) |
+Apres deploiement, la commande `PT-QDAO` passera automatiquement a "Paye" lors du prochain paiement test, ou on peut mettre a jour manuellement via l'admin.
 
-## Implementation Technique
+## Section Technique
 
-### 1. Stocker le Webhook Secret
+### Changements Exacts
 
-**Secret a ajouter** : `STRIPE_WEBHOOK_SECRET`
-**Valeur** : `whsec_3FpkWiRA87uLXCl4bVWg9NsxkCyhyguG`
-
-Ce secret permet de verifier que les requetes proviennent bien de Stripe et non d'un attaquant.
-
-### 2. Creer l'Edge Function `stripe-webhook`
-
-**Chemin** : `supabase/functions/stripe-webhook/index.ts`
-
-**Responsabilites** :
-- Recevoir les events POST de Stripe
-- Verifier la signature avec le webhook secret
-- Parser l'evenement
-- Pour `checkout.session.completed` :
-  - Recuperer l'order_id depuis les metadata
-  - Verifier que la commande n'est pas deja payee (idempotence)
-  - Mettre a jour le statut vers `pending`
-  - Stocker le `payment_intent_id` et `paid_at`
-  - Declencher l'envoi d'email
-
-**Code cle** :
+**stripe-webhook/index.ts ligne 93-97** :
 ```typescript
-// Verification de signature Stripe
-const signature = req.headers.get("stripe-signature");
-const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
-const event = await stripe.webhooks.constructEventAsync(
-  body,
-  signature,
-  webhookSecret
-);
-
-// Idempotence : ne pas retraiter une commande deja payee
-if (order.status !== "awaiting_payment") {
-  return new Response(JSON.stringify({ received: true, skipped: true }));
-}
+.update({
+  status: "paid",  // Changed from "pending"
+  stripe_payment_intent_id: session.payment_intent as string,
+  paid_at: new Date().toISOString(),
+})
 ```
 
-### 3. Configurer l'Edge Function
-
-**Fichier** : `supabase/config.toml`
-
-```toml
-[functions.stripe-webhook]
-verify_jwt = false  # Stripe envoie ses propres tokens, pas de JWT Supabase
+**verify-payment/index.ts ligne 94-98** :
+```typescript
+.update({
+  status: "paid",  // Changed from "pending"
+  stripe_payment_intent_id: paymentIntent?.id || null,
+  paid_at: new Date().toISOString(),
+})
 ```
 
-### 4. Configurer le Webhook dans Stripe Dashboard
+### Deploiement
 
-**URL du webhook** : 
-`https://kqsxscjtlipregkrmucg.supabase.co/functions/v1/stripe-webhook`
-
-**Evenements a ecouter** :
-- `checkout.session.completed`
-- `payment_intent.payment_failed` (optionnel)
-
-## Securite
-
-| Risque | Protection |
-|--------|------------|
-| Requete falsifiee | Verification de signature avec `stripe-signature` header |
-| Replay attack | Stripe inclut un timestamp dans la signature |
-| Double traitement | Verification du statut actuel avant mise a jour (idempotence) |
-| Donnees sensibles | Aucune donnee de carte n'est transmise, seulement les IDs |
-
-## Fichiers a Creer/Modifier
-
-| Fichier | Action |
-|---------|--------|
-| Secret `STRIPE_WEBHOOK_SECRET` | Ajouter via outil Supabase |
-| `supabase/functions/stripe-webhook/index.ts` | Creer |
-| `supabase/config.toml` | Ajouter config fonction |
-
-## Test
-
-1. Utiliser Stripe CLI pour tester localement :
-   ```bash
-   stripe listen --forward-to localhost:54321/functions/v1/stripe-webhook
-   ```
-
-2. Declencher un paiement test et verifier :
-   - La commande passe bien en `pending`
-   - L'email est envoye
-   - Le `paid_at` et `stripe_payment_intent_id` sont remplis
-
-## Avantages de cette Implementation
-
-- **Fiabilite** : Les paiements sont captures meme si le navigateur est ferme
-- **Idempotence** : Le webhook et la page de succes peuvent tous deux traiter le paiement sans conflit
-- **Securite** : Signature cryptographique pour authentifier Stripe
-- **Simplicite** : Reutilise la logique existante de `send-order-email`
+Les deux Edge Functions devront etre redeployees apres modification.
