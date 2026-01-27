@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Zap, CircuitBoard, BatteryCharging, ChevronDown } from "lucide-react";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { ChevronLeft, ChevronRight, Zap, CircuitBoard, BatteryCharging, ChevronDown, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScooterModel, voltageOptions, amperageOptions } from "@/data/scooterData";
 import useEmblaCarousel from "embla-carousel-react";
@@ -24,6 +24,87 @@ interface ScooterCarouselProps {
   totalModels?: number;
   currentIndex?: number;
 }
+
+// Animation variants for staggered specs
+const specsContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.3,
+    }
+  }
+};
+
+const specItemVariants = {
+  hidden: { 
+    opacity: 0, 
+    x: 20,
+    scale: 0.95
+  },
+  visible: { 
+    opacity: 1, 
+    x: 0,
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      damping: 15,
+      stiffness: 200,
+    }
+  }
+};
+
+// Premium transition config
+const premiumTransition = {
+  duration: 0.8,
+  ease: [0.16, 1, 0.3, 1] as [number, number, number, number], // Expo.out cubic-bezier
+};
+
+// Circular Progress Component for auto-play
+const CircularProgress = ({ 
+  duration, 
+  isPaused, 
+  progress 
+}: { 
+  duration: number; 
+  isPaused: boolean;
+  progress: number;
+}) => {
+  return (
+    <div className="relative w-8 h-8 lg:w-10 lg:h-10">
+      <svg className="w-full h-full -rotate-90" viewBox="0 0 32 32">
+        <circle
+          cx="16" 
+          cy="16" 
+          r="14"
+          fill="none"
+          stroke="hsl(var(--mineral) / 0.2)"
+          strokeWidth="2"
+        />
+        <motion.circle
+          cx="16" 
+          cy="16" 
+          r="14"
+          fill="none"
+          stroke="hsl(var(--mineral))"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeDasharray={88} // 2 * PI * 14
+          strokeDashoffset={88 - (progress * 88)}
+          style={{ transformOrigin: "center" }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        {isPaused ? (
+          <Play className="w-3 h-3 lg:w-4 lg:h-4 text-mineral" />
+        ) : (
+          <Pause className="w-3 h-3 lg:w-4 lg:h-4 text-mineral/50" />
+        )}
+      </div>
+    </div>
+  );
+};
 
 // Parse spec value to number (e.g., "300W" -> 300)
 const parseSpecValue = (spec: string): number => {
@@ -50,6 +131,12 @@ const ScooterCarousel = ({
   const [selectedAmperage, setSelectedAmperage] = useState<number | null>(null);
   const [voltageOpen, setVoltageOpen] = useState(false);
   const [amperageOpen, setAmperageOpen] = useState(false);
+  
+  // New states for animations
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
+  const [isHovered, setIsHovered] = useState(false);
+  const [autoPlayProgress, setAutoPlayProgress] = useState(0);
+  const autoPlayDuration = 5000; // 5 seconds
   
   const activeModel = models[activeIndex] || models[0];
   
@@ -86,6 +173,41 @@ const ScooterCarousel = ({
   
   const displayWattage = activeModel ? parseSpecValue(activeModel.specs?.power || "0W") : 0;
 
+  // Navigation handlers with direction tracking
+  const scrollPrev = useCallback(() => {
+    setSlideDirection('left');
+    setAutoPlayProgress(0);
+    emblaApi?.scrollPrev();
+    onNavigatePrev?.();
+  }, [emblaApi, onNavigatePrev]);
+  
+  const scrollNext = useCallback(() => {
+    setSlideDirection('right');
+    setAutoPlayProgress(0);
+    emblaApi?.scrollNext();
+    onNavigateNext?.();
+  }, [emblaApi, onNavigateNext]);
+
+  // Auto-play effect
+  useEffect(() => {
+    if (isHovered || models.length <= 1) {
+      return;
+    }
+    
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / autoPlayDuration, 1);
+      setAutoPlayProgress(progress);
+      
+      if (progress >= 1) {
+        scrollNext();
+      }
+    }, 50);
+    
+    return () => clearInterval(interval);
+  }, [isHovered, models.length, scrollNext, activeIndex]);
+
   // Track model changes for animation trigger + reset selectors
   useEffect(() => {
     if (activeModel && activeModel.id !== prevActiveId) {
@@ -117,16 +239,6 @@ const ScooterCarousel = ({
     }
   }, [emblaApi, activeIndex]);
 
-  const scrollPrev = () => {
-    emblaApi?.scrollPrev();
-    onNavigatePrev?.();
-  };
-  
-  const scrollNext = () => {
-    emblaApi?.scrollNext();
-    onNavigateNext?.();
-  };
-
   if (models.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-12">
@@ -142,7 +254,11 @@ const ScooterCarousel = ({
   }
 
   return (
-    <div className="relative flex flex-col lg:flex-row items-center justify-center w-full">
+    <div 
+      className="relative flex flex-col lg:flex-row items-center justify-center w-full"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Background Text Effect - TROTTINETTE - Hidden on mobile */}
       <div className="absolute inset-0 hidden lg:flex items-center justify-center pointer-events-none overflow-hidden select-none">
         <span 
@@ -204,95 +320,99 @@ const ScooterCarousel = ({
       {/* FLOATING SPECS - Centered below image on mobile, positioned on desktop */}
       <motion.div 
         key={`specs-floating-${activeModel?.id}`}
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3, duration: 0.4 }}
+        initial="hidden"
+        animate="visible"
+        variants={specsContainerVariants}
         className="relative lg:absolute mt-2 lg:mt-0 lg:top-[26%] lg:left-[52%] lg:-translate-y-1/2 z-30 order-3 lg:order-none"
       >
         <div className="flex items-center justify-center gap-1.5 lg:gap-2.5 px-2 lg:px-3.5 py-1.5 lg:py-2.5 
                         bg-white/90 backdrop-blur-md rounded-lg border border-mineral/15 
                         shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
           
-          {/* Voltage avec label */}
-          <Popover open={voltageOpen} onOpenChange={setVoltageOpen}>
-            <PopoverTrigger asChild>
-              <button className="flex flex-col items-center gap-0.5 hover:bg-mineral/5 rounded px-1.5 lg:px-2 py-0.5 lg:py-1 transition-colors group cursor-pointer">
-                <span className="text-[7px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Volt</span>
-                <div className="flex items-center gap-0.5">
-                  <CircuitBoard className="w-3 h-3 lg:w-4 lg:h-4 text-amber-500" />
-                  <AnimatedNumber 
-                    value={displayVoltage}
-                    className="font-display text-sm lg:text-lg text-carbon"
-                  />
-                  <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">V</span>
-                  <ChevronDown className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
-                </div>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-20 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={6}>
-              <Command>
-                <CommandList>
-                  {availableVoltages.map((v) => (
-                    <CommandItem
-                      key={v}
-                      onSelect={() => {
-                        setSelectedVoltage(v);
-                        setVoltageOpen(false);
-                      }}
-                      className={`cursor-pointer text-xs ${displayVoltage === v ? 'bg-mineral/10 font-semibold' : ''}`}
-                    >
-                      {v}V
-                    </CommandItem>
-                  ))}
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          {/* Voltage avec label - Animated */}
+          <motion.div variants={specItemVariants}>
+            <Popover open={voltageOpen} onOpenChange={setVoltageOpen}>
+              <PopoverTrigger asChild>
+                <button className="flex flex-col items-center gap-0.5 hover:bg-mineral/5 rounded px-1.5 lg:px-2 py-0.5 lg:py-1 transition-colors group cursor-pointer">
+                  <span className="text-[7px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Volt</span>
+                  <div className="flex items-center gap-0.5">
+                    <CircuitBoard className="w-3 h-3 lg:w-4 lg:h-4 text-amber-500" />
+                    <AnimatedNumber 
+                      value={displayVoltage}
+                      className="font-display text-sm lg:text-lg text-carbon"
+                    />
+                    <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">V</span>
+                    <ChevronDown className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
+                  </div>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-20 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={6}>
+                <Command>
+                  <CommandList>
+                    {availableVoltages.map((v) => (
+                      <CommandItem
+                        key={v}
+                        onSelect={() => {
+                          setSelectedVoltage(v);
+                          setVoltageOpen(false);
+                        }}
+                        className={`cursor-pointer text-xs ${displayVoltage === v ? 'bg-mineral/10 font-semibold' : ''}`}
+                      >
+                        {v}V
+                      </CommandItem>
+                    ))}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </motion.div>
 
           {/* Divider */}
-          <div className="h-5 lg:h-7 w-px bg-mineral/20" />
+          <motion.div variants={specItemVariants} className="h-5 lg:h-7 w-px bg-mineral/20" />
 
-          {/* Amperage avec label */}
-          <Popover open={amperageOpen} onOpenChange={setAmperageOpen}>
-            <PopoverTrigger asChild>
-              <button className="flex flex-col items-center gap-0.5 hover:bg-mineral/5 rounded px-1.5 lg:px-2 py-0.5 lg:py-1 transition-colors group cursor-pointer">
-                <span className="text-[7px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Ah</span>
-                <div className="flex items-center gap-0.5">
-                  <BatteryCharging className="w-3 h-3 lg:w-4 lg:h-4 text-green-500" />
-                  <AnimatedNumber 
-                    value={displayAmperage}
-                    className="font-display text-sm lg:text-lg text-carbon"
-                  />
-                  <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">Ah</span>
-                  <ChevronDown className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
-                </div>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-20 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={6}>
-              <Command>
-                <CommandList>
-                  {availableAmperages.map((a) => (
-                    <CommandItem
-                      key={a}
-                      onSelect={() => {
-                        setSelectedAmperage(a);
-                        setAmperageOpen(false);
-                      }}
-                      className={`cursor-pointer text-xs ${displayAmperage === a ? 'bg-mineral/10 font-semibold' : ''}`}
-                    >
-                      {a}Ah
-                    </CommandItem>
-                  ))}
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          {/* Amperage avec label - Animated */}
+          <motion.div variants={specItemVariants}>
+            <Popover open={amperageOpen} onOpenChange={setAmperageOpen}>
+              <PopoverTrigger asChild>
+                <button className="flex flex-col items-center gap-0.5 hover:bg-mineral/5 rounded px-1.5 lg:px-2 py-0.5 lg:py-1 transition-colors group cursor-pointer">
+                  <span className="text-[7px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Ah</span>
+                  <div className="flex items-center gap-0.5">
+                    <BatteryCharging className="w-3 h-3 lg:w-4 lg:h-4 text-green-500" />
+                    <AnimatedNumber 
+                      value={displayAmperage}
+                      className="font-display text-sm lg:text-lg text-carbon"
+                    />
+                    <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">Ah</span>
+                    <ChevronDown className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-muted-foreground group-hover:text-carbon transition-colors" />
+                  </div>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-20 p-1 bg-white border border-mineral/20 shadow-lg" align="center" sideOffset={6}>
+                <Command>
+                  <CommandList>
+                    {availableAmperages.map((a) => (
+                      <CommandItem
+                        key={a}
+                        onSelect={() => {
+                          setSelectedAmperage(a);
+                          setAmperageOpen(false);
+                        }}
+                        className={`cursor-pointer text-xs ${displayAmperage === a ? 'bg-mineral/10 font-semibold' : ''}`}
+                      >
+                        {a}Ah
+                      </CommandItem>
+                    ))}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </motion.div>
 
           {/* Divider */}
-          <div className="h-5 lg:h-7 w-px bg-mineral/20" />
+          <motion.div variants={specItemVariants} className="h-5 lg:h-7 w-px bg-mineral/20" />
 
-          {/* Wattage avec label */}
-          <div className="flex flex-col items-center gap-0.5 px-1.5 lg:px-2 py-0.5 lg:py-1">
+          {/* Wattage avec label - Animated */}
+          <motion.div variants={specItemVariants} className="flex flex-col items-center gap-0.5 px-1.5 lg:px-2 py-0.5 lg:py-1">
             <span className="text-[7px] lg:text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Watt</span>
             <div className="flex items-center gap-0.5">
               <Zap className="w-3 h-3 lg:w-4 lg:h-4 text-yellow-500" />
@@ -302,7 +422,7 @@ const ScooterCarousel = ({
               />
               <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">W</span>
             </div>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
 
@@ -311,7 +431,7 @@ const ScooterCarousel = ({
         className="relative lg:absolute mt-3 lg:mt-0 lg:bottom-[14%] lg:left-1/2 lg:-translate-x-1/2 z-40 order-5 lg:order-none flex justify-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.4 }}
+        transition={{ delay: 0.4, ...premiumTransition }}
       >
         <button
           onClick={() => document.getElementById('compatible-parts')?.scrollIntoView({ behavior: 'smooth' })}
@@ -333,27 +453,55 @@ const ScooterCarousel = ({
         </button>
       </motion.div>
 
-      {/* Pagination Dots - Relative on mobile, absolute on desktop */}
+      {/* Pagination Dots + Circular Progress - Relative on mobile, absolute on desktop */}
       <motion.div 
         className="relative lg:absolute mt-2 lg:mt-0 lg:bottom-[3%] lg:left-1/2 lg:-translate-x-1/2 z-20 flex items-center justify-center gap-2 lg:gap-4 order-4 lg:order-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
+        {/* Circular Progress Indicator */}
+        <motion.div
+          className="cursor-pointer"
+          onClick={() => setIsHovered(!isHovered)}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <CircularProgress 
+            duration={autoPlayDuration} 
+            isPaused={isHovered}
+            progress={autoPlayProgress}
+          />
+        </motion.div>
+
         {/* Navigation Dots - Massive for better UX */}
         <div className="flex items-center gap-2 lg:gap-4">
-          {Array.from({ length: Math.min(5, models.length) }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => onSelect(index)}
-              className={cn(
-                "rounded-full transition-all duration-300",
-                index === activeIndex
-                  ? "w-6 lg:w-14 h-3 lg:h-5 bg-mineral"
-                  : "w-3 h-3 lg:w-6 lg:h-6 bg-mineral/30 hover:bg-mineral/50"
-              )}
-            />
-          ))}
+          {Array.from({ length: Math.min(5, models.length) }).map((_, index) => {
+            const isActive = index === activeIndex;
+            return (
+              <motion.button
+                key={index}
+                onClick={() => {
+                  setAutoPlayProgress(0);
+                  onSelect(index);
+                }}
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
+                animate={{
+                  boxShadow: isActive 
+                    ? "0 0 20px hsl(var(--mineral) / 0.6)" 
+                    : "0 0 0px transparent"
+                }}
+                transition={{ duration: 0.3 }}
+                className={cn(
+                  "rounded-full transition-all duration-300",
+                  isActive
+                    ? "w-6 lg:w-14 h-3 lg:h-5 bg-mineral"
+                    : "w-3 h-3 lg:w-6 lg:h-6 bg-mineral/30 hover:bg-mineral/50"
+                )}
+              />
+            );
+          })}
         </div>
         
         {/* Dynamic Counter - Massive */}
@@ -402,11 +550,7 @@ const ScooterCarousel = ({
                     opacity: opacity,
                     filter: isActive ? "blur(0px)" : "blur(2px)",
                   }}
-                  transition={{ 
-                    duration: 0.5, 
-                    ease: [0.25, 0.46, 0.45, 0.94],
-                    filter: { duration: 0.3 }
-                  }}
+                  transition={premiumTransition}
                 >
                     {/* Scooter Container - Constrained height on mobile */}
                     <div className="relative w-full max-w-[300px] lg:max-w-[950px] mx-auto h-[320px] lg:h-[680px] xl:h-[750px] flex items-center justify-center">
@@ -422,7 +566,7 @@ const ScooterCarousel = ({
                       />
                     </div>
                     
-                    {/* Elegant Reveal Animation - Subtle */}
+                    {/* Elegant Reveal Animation with Parallax */}
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={model.id}
@@ -430,38 +574,55 @@ const ScooterCarousel = ({
                         initial={{ 
                           opacity: 0, 
                           scale: 0.95,
-                          y: 10
+                          x: slideDirection === 'right' ? 60 : -60
                         }}
                         animate={{ 
                           opacity: 1, 
                           scale: 1,
-                          y: 0
+                          x: 0
                         }}
                         exit={{ 
                           opacity: 0, 
                           scale: 0.95,
-                          y: -10
+                          x: slideDirection === 'right' ? -40 : 40
                         }}
-                        transition={{ 
-                          duration: 0.5, 
-                          ease: [0.25, 0.46, 0.45, 0.94]
-                        }}
+                        transition={premiumTransition}
                       >
                         {/* Subtle glow effect */}
-                        <div
+                        <motion.div
                           className="absolute inset-0 blur-2xl opacity-20"
                           style={{
                             background: "radial-gradient(ellipse at center, rgba(147,181,161,0.3) 0%, transparent 60%)"
                           }}
+                          initial={{ scale: 0.8 }}
+                          animate={{ scale: 1 }}
+                          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                         />
                         
-                        <img
+                        {/* Image with parallax effect (slightly slower) */}
+                        <motion.img
                           src={imageSrc}
                           alt={`${model.brand} ${model.name}`}
                           className="relative w-full h-[80%] object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
                           style={{
                             maskImage: 'linear-gradient(to bottom, black 75%, transparent 100%)',
                             WebkitMaskImage: 'linear-gradient(to bottom, black 75%, transparent 100%)'
+                          }}
+                          initial={{ 
+                            x: slideDirection === 'right' ? 80 : -80,
+                            opacity: 0 
+                          }}
+                          animate={{ 
+                            x: 0,
+                            opacity: 1 
+                          }}
+                          exit={{ 
+                            x: slideDirection === 'right' ? -50 : 50,
+                            opacity: 0 
+                          }}
+                          transition={{ 
+                            duration: 1, 
+                            ease: [0.16, 1, 0.3, 1] as [number, number, number, number] // Parallax: slower than container
                           }}
                         />
                         
