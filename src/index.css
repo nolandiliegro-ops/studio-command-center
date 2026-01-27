@@ -339,7 +339,7 @@
   perspective: 2000px;
 }
 
-/* Gaming Card Center Glow Pulse */
+/* Gaming Card Center Glow Pulse - Dark Theme */
 .gaming-card-center {
   animation: centerCardPulse 3s ease-in-out infinite;
 }
@@ -353,7 +353,21 @@
   }
 }
 
-  /* Grille Néon Background */
+/* Gaming Card Center Glow Pulse - Light Theme (Greige) */
+.gaming-card-center-light {
+  animation: centerCardPulseLight 3s ease-in-out infinite;
+}
+
+@keyframes centerCardPulseLight {
+  0%, 100% {
+    box-shadow: 0 12px 40px rgba(147, 181, 161, 0.25), 0 8px 32px rgba(26, 26, 26, 0.08);
+  }
+  50% {
+    box-shadow: 0 16px 50px rgba(147, 181, 161, 0.35), 0 12px 40px rgba(26, 26, 26, 0.1);
+  }
+}
+
+  /* Grille Néon Background - Dark Theme */
   .gaming-grid-bg {
     position: absolute;
     inset: 0;
@@ -365,14 +379,36 @@
     pointer-events: none;
   }
 
+  /* Grille Néon Background - Light Theme (Greige) */
+  .gaming-grid-bg-light {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(147, 181, 161, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(147, 181, 161, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridPulseLight 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
   @keyframes gridPulse {
     0%, 100% { opacity: 0.3; }
     50% { opacity: 0.6; }
   }
 
-  /* Glow Pulsant sur Image */
+  @keyframes gridPulseLight {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Glow Pulsant sur Image - Dark Theme */
   .gaming-product-glow {
     animation: productGlow 2s ease-in-out infinite;
+  }
+
+  /* Glow Pulsant sur Image - Light Theme */
+  .gaming-product-glow-light {
+    animation: productGlowLight 2s ease-in-out infinite;
   }
 
   @keyframes productGlow {
@@ -381,6 +417,15 @@
     }
     50% {
       filter: drop-shadow(0 0 40px rgba(147, 181, 161, 0.8));
+    }
+  }
+
+  @keyframes productGlowLight {
+    0%, 100% {
+      filter: drop-shadow(0 0 15px rgba(147, 181, 161, 0.25));
+    }
+    50% {
+      filter: drop-shadow(0 0 30px rgba(147, 181, 161, 0.45));
     }
   }
 
@@ -411,9 +456,14 @@
     to { transform: rotate(360deg); }
   }
 
-  /* Navigation Arrows Glow */
+  /* Navigation Arrows Glow - Dark Theme */
   .gaming-nav-btn:hover > div {
     box-shadow: 0 0 40px rgba(147, 181, 161, 0.6), inset 0 0 30px rgba(147, 181, 161, 0.2);
+  }
+
+  /* Navigation Arrows Glow - Light Theme */
+  .gaming-nav-btn-light:hover > div {
+    box-shadow: 0 8px 30px rgba(147, 181, 161, 0.4), 0 4px 20px rgba(26, 26, 26, 0.1);
   }
 }
 
