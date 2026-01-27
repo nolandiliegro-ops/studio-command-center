@@ -62,7 +62,7 @@ const generateEmailHTML = (data: OrderEmailRequest): string => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confirmation de commande - Pièces de Trot</title>
+  <title>Confirmation de commande - piecestrottinettes.fr</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #F5F3F0; font-family: 'Helvetica Neue', Arial, sans-serif;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F5F3F0;">
@@ -74,7 +74,7 @@ const generateEmailHTML = (data: OrderEmailRequest): string => {
           <tr>
             <td style="background: linear-gradient(135deg, #93B5A1 0%, #7DA08D 100%); padding: 40px 32px; text-align: center;">
               <h1 style="margin: 0; font-family: 'Georgia', serif; font-size: 28px; color: #FFFFFF; letter-spacing: 4px; font-weight: 400;">
-                PIÈCES DE TROT
+                PIECESTROTTINETTES.FR
               </h1>
               <p style="margin: 12px 0 0; font-size: 14px; color: rgba(255, 255, 255, 0.9); letter-spacing: 2px;">
                 ROULE · RÉPARE · DURE
@@ -215,7 +215,7 @@ const generateEmailHTML = (data: OrderEmailRequest): string => {
                 ROULE · RÉPARE · DURE
               </p>
               <p style="margin: 0; font-size: 12px; color: #888;">
-                Pièces de Trot - Votre expert en pièces détachées pour trottinettes électriques
+                piecestrottinettes.fr - Votre expert en pièces détachées pour trottinettes électriques
               </p>
               <p style="margin: 16px 0 0; font-size: 11px; color: #666;">
                 Vous recevez cet email car vous avez passé une commande sur notre site.
@@ -249,9 +249,9 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending order confirmation email to ${data.customerEmail} for order ${data.orderNumber}`);
 
     const emailResponse = await resend.emails.send({
-      from: "Pièces de Trot <noreply@piecestrottinettes.fr>",
+      from: "piecestrottinettes.fr <noreply@piecestrottinettes.fr>",
       to: [data.customerEmail],
-      subject: `Commande ${data.orderNumber} confirmée - Pièces de Trot`,
+      subject: `Commande ${data.orderNumber} confirmée - piecestrottinettes.fr`,
       html: generateEmailHTML(data),
     });
 
