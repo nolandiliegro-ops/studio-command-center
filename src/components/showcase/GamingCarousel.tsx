@@ -23,19 +23,22 @@ interface GamingCarouselProps {
 
 const GamingCarouselSkeleton = () => (
   <div 
-    className="relative w-full overflow-hidden py-12"
+    className="relative w-full py-16 md:py-20"
     style={{
-      background: "linear-gradient(180deg, #F5F3F0 0%, #D5D3CE 100%)",
-      minHeight: "500px",
+      background: "linear-gradient(180deg, #D5D3CE 0%, #C5C3BE 100%)",
+      minHeight: "600px",
     }}
   >
-    <div className="flex items-center justify-center gap-6 md:gap-8 px-5 md:px-10 lg:px-20">
-      {[...Array(5)].map((_, i) => (
+    <div className="flex items-center justify-center gap-8 md:gap-10 lg:gap-12 px-5 md:px-10 lg:px-20">
+      {[0.85, 0.9, 1, 1.4, 1, 0.9, 0.85].map((scale, i) => (
         <Skeleton 
           key={i} 
-          className={`rounded-[20px] bg-white/50 flex-shrink-0 ${
-            i === 2 ? "w-[300px] h-[420px]" : "w-[260px] h-[380px]"
-          }`} 
+          className="rounded-2xl bg-white/30 flex-shrink-0"
+          style={{
+            width: scale === 1.4 ? "240px" : scale === 1 ? "200px" : scale === 0.9 ? "180px" : "160px",
+            height: scale === 1.4 ? "400px" : "320px",
+            opacity: scale === 1.4 ? 1 : scale === 1 ? 0.8 : scale === 0.9 ? 0.6 : 0.5,
+          }}
         />
       ))}
     </div>
@@ -94,14 +97,23 @@ const GamingCarousel = ({ parts, activeModelName, isLoading }: GamingCarouselPro
     );
   }
 
+  // Calculate dynamic width based on distance from center
+  const getCardWidth = (distance: number) => {
+    if (distance === 0) return "240px";   // Central - will be 336px with 1.4 scale
+    if (distance === 1) return "200px";   // Adjacent
+    if (distance === 2) return "180px";   // Éloigné proche
+    return "160px";                        // Très éloigné
+  };
+
   return (
     <div 
-      className="relative w-full overflow-hidden gaming-carousel-container"
+      className="relative w-full gaming-carousel-container"
       style={{
-        background: "linear-gradient(180deg, #F5F3F0 0%, #D5D3CE 100%)",
+        background: "linear-gradient(180deg, #D5D3CE 0%, #C5C3BE 100%)",
+        minHeight: "600px",
       }}
     >
-      {/* Neon Grid Background - Subtle on light */}
+      {/* Subtle Grid Background */}
       <div className="gaming-grid-bg-light" />
 
       {/* Header with model name */}
@@ -109,7 +121,7 @@ const GamingCarousel = ({ parts, activeModelName, isLoading }: GamingCarouselPro
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center pt-8 pb-4 relative z-10"
+          className="text-center pt-10 pb-6 relative z-10"
         >
           <span className="text-carbon/50 text-sm uppercase tracking-widest">
             Pour votre
@@ -120,52 +132,61 @@ const GamingCarousel = ({ parts, activeModelName, isLoading }: GamingCarouselPro
         </motion.div>
       )}
 
-      {/* Navigation Arrow Left */}
+      {/* Navigation Arrow Left - 80px glassmorphism */}
       <motion.button
         onClick={scrollPrev}
-        className="absolute left-4 md:left-8 lg:left-16 top-1/2 -translate-y-1/2 z-20 gaming-nav-btn-light"
+        className="absolute left-4 md:left-8 lg:left-10 top-1/2 -translate-y-1/2 z-20"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Produit précédent"
       >
         <div 
-          className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 flex items-center justify-center rounded-full transition-all duration-300"
+          className="nav-arrow-glass w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 flex items-center justify-center rounded-full transition-all duration-300"
           style={{
-            background: "rgba(255, 255, 255, 0.9)",
-            border: "1px solid rgba(147, 181, 161, 0.3)",
-            boxShadow: "0 4px 20px rgba(26, 26, 26, 0.1), 0 0 20px rgba(147, 181, 161, 0.15)",
+            background: "rgba(255, 255, 255, 0.85)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid rgba(255, 255, 255, 0.4)",
+            boxShadow: "0 8px 32px rgba(26, 26, 26, 0.12), 0 0 0 1px rgba(147, 181, 161, 0.1)",
           }}
         >
-          <ChevronLeft className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-mineral" />
+          <ChevronLeft className="w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 text-carbon" />
         </div>
       </motion.button>
 
-      {/* Navigation Arrow Right */}
+      {/* Navigation Arrow Right - 80px glassmorphism */}
       <motion.button
         onClick={scrollNext}
-        className="absolute right-4 md:right-8 lg:right-16 top-1/2 -translate-y-1/2 z-20 gaming-nav-btn-light"
+        className="absolute right-4 md:right-8 lg:right-10 top-1/2 -translate-y-1/2 z-20"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Produit suivant"
       >
         <div 
-          className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 flex items-center justify-center rounded-full transition-all duration-300"
+          className="nav-arrow-glass w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 flex items-center justify-center rounded-full transition-all duration-300"
           style={{
-            background: "rgba(255, 255, 255, 0.9)",
-            border: "1px solid rgba(147, 181, 161, 0.3)",
-            boxShadow: "0 4px 20px rgba(26, 26, 26, 0.1), 0 0 20px rgba(147, 181, 161, 0.15)",
+            background: "rgba(255, 255, 255, 0.85)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid rgba(255, 255, 255, 0.4)",
+            boxShadow: "0 8px 32px rgba(26, 26, 26, 0.12), 0 0 0 1px rgba(147, 181, 161, 0.1)",
           }}
         >
-          <ChevronRight className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-mineral" />
+          <ChevronRight className="w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 text-carbon" />
         </div>
       </motion.button>
 
-      {/* Carousel */}
-      <div className="py-10 md:py-14 px-5 md:px-10 lg:px-20">
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-6 md:gap-8">
+      {/* Carousel - overflow visible for edge-cut products */}
+      <div className="py-12 md:py-16 lg:py-20 px-5 md:px-10 lg:px-20">
+        <div 
+          className="overflow-visible" 
+          ref={emblaRef}
+          style={{
+            clipPath: "inset(-100px 0)",
+          }}
+        >
+          <div className="flex gap-8 md:gap-10 lg:gap-12 items-center">
             {parts.map((part, index) => {
-              // Calculate distance from center for depth effect
               const distanceFromCenter = Math.abs(index - selectedIndex);
               const wrappedDistance = Math.min(
                 distanceFromCenter,
@@ -175,9 +196,9 @@ const GamingCarousel = ({ parts, activeModelName, isLoading }: GamingCarouselPro
               return (
                 <div 
                   key={part.id} 
-                  className="flex-shrink-0 transition-all duration-[800ms] ease-out"
+                  className="flex-shrink-0 transition-all duration-[600ms] ease-out"
                   style={{
-                    width: "clamp(240px, 20vw, 300px)",
+                    width: getCardWidth(wrappedDistance),
                   }}
                 >
                   <GamingCarouselCard
@@ -194,14 +215,14 @@ const GamingCarousel = ({ parts, activeModelName, isLoading }: GamingCarouselPro
       </div>
 
       {/* Pagination Dots */}
-      <div className="flex justify-center gap-2 pb-8">
+      <div className="flex justify-center gap-2 pb-10">
         {parts.slice(0, Math.min(parts.length, 10)).map((_, index) => (
           <button
             key={index}
             onClick={() => emblaApi?.scrollTo(index)}
             className={`transition-all duration-300 rounded-full ${
               index === selectedIndex 
-                ? "w-8 h-2 bg-mineral shadow-[0_0_10px_rgba(147,181,161,0.5)]" 
+                ? "w-8 h-2 bg-mineral shadow-[0_0_12px_rgba(147,181,161,0.6)]" 
                 : "w-2 h-2 bg-carbon/20 hover:bg-carbon/40"
             }`}
             aria-label={`Aller au produit ${index + 1}`}
@@ -213,7 +234,7 @@ const GamingCarousel = ({ parts, activeModelName, isLoading }: GamingCarouselPro
       </div>
 
       {/* Counter */}
-      <div className="absolute bottom-4 right-4 text-carbon/30 text-sm font-mono">
+      <div className="absolute bottom-4 right-6 text-carbon/30 text-sm font-mono">
         {selectedIndex + 1} / {parts.length}
       </div>
     </div>
