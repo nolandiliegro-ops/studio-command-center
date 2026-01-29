@@ -88,8 +88,6 @@ const GamingCarousel = ({
       {/* Subtle Grid Background */}
       <div className="gaming-grid-bg-light" />
 
-      {/* Header with model name - Compact inline badge */}
-      {activeModelName}
 
       {/* Navigation Arrow Left - 80px glassmorphism */}
       <motion.button onClick={scrollPrev} className="absolute left-4 md:left-8 lg:left-10 top-1/2 -translate-y-1/2 z-20" whileHover={{
