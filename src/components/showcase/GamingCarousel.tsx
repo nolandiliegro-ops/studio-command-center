@@ -26,7 +26,7 @@ const GamingCarouselSkeleton = () => (
     className="relative w-full py-16 md:py-20"
     style={{
       background: "linear-gradient(180deg, #FAFAF8 0%, #F5F3F0 100%)",
-      minHeight: "600px",
+      minHeight: "800px",
     }}
   >
     <div className="flex items-center justify-center gap-8 md:gap-10 lg:gap-12 px-5 md:px-10 lg:px-20">
@@ -99,10 +99,10 @@ const GamingCarousel = ({ parts, activeModelName, isLoading }: GamingCarouselPro
 
   // Calculate dynamic width based on distance from center
   const getCardWidth = (distance: number) => {
-    if (distance === 0) return "240px";   // Central - will be 336px with 1.4 scale
-    if (distance === 1) return "200px";   // Adjacent
-    if (distance === 2) return "180px";   // Éloigné proche
-    return "160px";                        // Très éloigné
+    if (distance === 0) return "480px";   // Doublé - Central
+    if (distance === 1) return "400px";   // Doublé - Adjacent
+    if (distance === 2) return "360px";   // Doublé - Éloigné proche
+    return "320px";                        // Doublé - Très éloigné
   };
 
   return (
@@ -110,7 +110,7 @@ const GamingCarousel = ({ parts, activeModelName, isLoading }: GamingCarouselPro
       className="relative w-full gaming-carousel-container"
       style={{
         background: "linear-gradient(180deg, #FAFAF8 0%, #F5F3F0 100%)",
-        minHeight: "600px",
+        minHeight: "800px",
       }}
     >
       {/* Subtle Grid Background */}
