@@ -96,7 +96,7 @@ const CommandPanel = ({
             className={`inline-block px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full ${activeBrandColors.bg} ${activeBrandColors.text} backdrop-blur-sm mb-2 shadow-sm`}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0 }}
           >
             <p className="text-[10px] lg:text-xs font-bold tracking-wide uppercase">
               {activeModel.brand}
@@ -108,7 +108,7 @@ const CommandPanel = ({
             className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-carbon mb-1 lg:mb-3 tracking-tighter leading-none uppercase"
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
+            transition={{ delay: 0 }}
           >
             {activeModel.name}
           </motion.h3>

@@ -26,14 +26,14 @@ interface ScooterCarouselProps {
   autoPlayEnabled?: boolean;
 }
 
-// Animation variants for staggered specs - AMPLIFIED for dramatic effect
+// Animation variants for staggered specs - NO DELAY for instant sync
 const specsContainerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.05,  // Réduit à 0.05s pour transition rapide
-      delayChildren: 0.1,     // Réduit à 0.1s pour éviter le décalage
+      staggerChildren: 0,  // ⚡ 0 delay for instant display
+      delayChildren: 0,    // ⚡ 0 delay to sync with image
     }
   }
 };
