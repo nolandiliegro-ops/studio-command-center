@@ -57,23 +57,26 @@ const HeroBranding = () => {
         Trouvez les pièces détachées 100% compatibles avec votre trottinette électrique. Qualité garantie, expédition rapide.
       </p>
 
-      {/* Bouton Catalogue Premium - LARGE avec micro-interactions */}
+      {/* Bouton Catalogue Premium - Pill Style */}
       <motion.div 
-        className="mt-4 lg:mt-5 animate-fade-in" 
+        className="mt-3 lg:mt-4 animate-fade-in" 
         style={{ animationDelay: "0.5s" }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.05, rotate: -2 }}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       >
         <Button 
           asChild 
-          variant="outline" 
-          size="lg" 
-          className="rounded-full gap-3 px-6 lg:px-8 py-6 text-base lg:text-lg font-semibold border-mineral/40 hover:bg-mineral hover:text-white hover:border-mineral transition-all duration-300 shadow-md hover:shadow-[0_8px_30px_rgba(147,181,161,0.5)] whitespace-nowrap"
+          className="rounded-full gap-2 px-6 lg:px-8 py-5 lg:py-6 text-sm lg:text-base font-bold tracking-wide
+                     bg-mineral text-white border-0
+                     shadow-[0_4px_20px_rgba(147,181,161,0.4)]
+                     hover:shadow-[0_8px_30px_rgba(147,181,161,0.6)]
+                     hover:bg-mineral-dark
+                     transition-all duration-300 whitespace-nowrap"
         >
           <Link to="/catalogue">
-            <ShoppingBag className="w-5 h-5" />
-            VOIR TOUT LE CATALOGUE
+            <ShoppingBag className="w-4 h-4 lg:w-5 lg:h-5" />
+            VOIR LE CATALOGUE
           </Link>
         </Button>
       </motion.div>
