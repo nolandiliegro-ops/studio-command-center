@@ -29,7 +29,7 @@ const GamingCarouselCard = ({
 
   // Scale based on distance - central product is HUGE (1.4)
   const getScale = () => {
-    if (isCenter) return 1.4;
+    if (isCenter) return 1.6;
     if (distanceFromCenter === 1) return 1.0;
     if (distanceFromCenter === 2) return 0.9;
     return 0.85;
@@ -60,9 +60,9 @@ const GamingCarouselCard = ({
 
   // Image size based on position
   const getImageSize = () => {
-    if (isCenter) return "400px";
-    if (distanceFromCenter === 1) return "320px";
-    return "280px";
+    if (isCenter) return "500px";
+    if (distanceFromCenter === 1) return "380px";
+    return "320px";
   };
 
   return (
