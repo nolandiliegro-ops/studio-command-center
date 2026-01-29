@@ -234,11 +234,22 @@ const ScooterCarousel = ({
   }, [selectedVoltage, selectedAmperage, availableAmperages]);
 
   useEffect(() => {
-    if (emblaApi) {
-      emblaApi.on("select", () => {
-        onSelect(emblaApi.selectedScrollSnap());
-      });
-    }
+    if (!emblaApi) return;
+
+    const onSelectHandler = () => {
+      const selectedIndex = emblaApi.selectedScrollSnap();
+      onSelect(selectedIndex);
+    };
+
+    // Use 'settle' instead of 'select' to ensure loop transitions are complete
+    emblaApi.on("settle", onSelectHandler);
+    // Also listen to 'select' for immediate feedback
+    emblaApi.on("select", onSelectHandler);
+
+    return () => {
+      emblaApi.off("settle", onSelectHandler);
+      emblaApi.off("select", onSelectHandler);
+    };
   }, [emblaApi, onSelect]);
 
   useEffect(() => {
