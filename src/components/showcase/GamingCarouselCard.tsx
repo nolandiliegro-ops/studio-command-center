@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Package, ShieldCheck, ShieldX } from "lucide-react";
+import { Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatPrice } from "@/lib/formatPrice";
 import { useIsCompatibleWithSelected } from "@/hooks/useIsCompatibleWithSelected";
@@ -141,71 +141,53 @@ const GamingCarouselCard = ({
           >
             {formatPrice(part.price || 0)}
           </span>
-          {/* Dynamic Compatibility Badge - Only when Garage scooter is selected */}
-          {selectedScooter && (
-            <div className="flex justify-center pt-1">
-              {isCompatible ? (
-                /* Green Compatible Badge with Brand LED Glow */
+          {/* Verification Mode: Compatible Badge + Reassuring Text */}
+          {selectedScooter && isCompatible && (
+            <motion.div 
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+              className="flex flex-col items-center gap-2 pt-2"
+            >
+              {/* Compact Green Badge with LED Glow */}
+              <motion.div
+                animate={{ 
+                  boxShadow: [
+                    `0 0 6px ${brandColors.glowColor}`,
+                    `0 0 12px ${brandColors.glowColor}`,
+                    `0 0 6px ${brandColors.glowColor}`,
+                  ]
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider text-white"
+                style={{
+                  background: "rgba(147, 181, 161, 0.85)",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255, 255, 255, 0.25)",
+                }}
+              >
+                {/* Pulsing LED dot with brand accent */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ 
-                    opacity: 1, 
-                    scale: 1,
-                    boxShadow: [
-                      `0 0 8px ${brandColors.glowColor}`,
-                      `0 0 16px ${brandColors.glowColor}`,
-                      `0 0 8px ${brandColors.glowColor}`,
-                    ]
+                    scale: [1, 1.4, 1],
+                    opacity: [1, 0.6, 1]
                   }}
-                  transition={{ 
-                    opacity: { duration: 0.3 },
-                    scale: { duration: 0.3 },
-                    boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-                  }}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-sm font-bold uppercase tracking-wide"
-                  style={{
-                    background: "rgba(147, 181, 161, 0.85)",
-                    backdropFilter: "blur(10px)",
-                    WebkitBackdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.3)",
-                  }}
-                >
-                  {/* Pulsing dot with brand accent */}
-                  <motion.div
-                    animate={{ 
-                      scale: [1, 1.3, 1],
-                      opacity: [1, 0.7, 1]
-                    }}
-                    transition={{ 
-                      duration: 1.5, 
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: brandColors.accent }}
-                  />
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Compatible</span>
-                </motion.div>
-              ) : (
-                /* Red Non-Compatible Badge */
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-sm font-bold uppercase tracking-wide"
-                  style={{
-                    background: "rgba(220, 38, 38, 0.85)",
-                    backdropFilter: "blur(10px)",
-                    WebkitBackdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.3)",
-                  }}
-                >
-                  <ShieldX className="w-4 h-4" />
-                  <span>Non Compatible</span>
-                </motion.div>
-              )}
-            </div>
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: brandColors.accent }}
+                />
+                <span>Compatible</span>
+              </motion.div>
+              
+              {/* Reassuring Text */}
+              <p className="text-xs text-muted-foreground/70 font-light italic leading-relaxed text-center max-w-[260px]">
+                Ce produit est également compatible avec votre{" "}
+                <span className="font-medium text-foreground/80 not-italic">
+                  {selectedScooter.name}
+                </span>
+              </p>
+            </motion.div>
           )}
         </motion.div>
       )}
