@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import AnimatedNumber from "@/components/ui/animated-number";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { getBrandColors } from "@/contexts/ScooterContext";
 
 interface CommandPanelProps {
   brands: Brand[];
@@ -23,15 +24,6 @@ interface CommandPanelProps {
   totalModels?: number;
   currentIndex?: number;
 }
-
-// Brand color mapping - synchronized with filters
-const brandColors: Record<string, { bg: string; text: string; border: string }> = {
-  dualtron: { bg: "bg-[hsl(43_100%_50%)]", text: "text-yellow-900", border: "border-yellow-500" },
-  kaabo: { bg: "bg-[hsl(0_70%_50%)]", text: "text-white", border: "border-red-500" },
-  xiaomi: { bg: "bg-[hsl(25_100%_50%)]", text: "text-white", border: "border-orange-500" },
-  ninebot: { bg: "bg-[hsl(207_90%_54%)]", text: "text-white", border: "border-blue-500" },
-  segway: { bg: "bg-[hsl(145_60%_40%)]", text: "text-white", border: "border-emerald-500" },
-};
 
 const CommandPanel = ({
   brands,
@@ -48,6 +40,9 @@ const CommandPanel = ({
   const searchContainerRef = useRef<HTMLDivElement>(null);
   
   const { data: searchResults = [], isLoading } = useSearchScooters(searchQuery);
+
+  // Get centralized brand colors for the active model
+  const activeBrandColors = getBrandColors(activeModel?.brandId);
 
   // Show dropdown when query is long enough and we have focus
   useEffect(() => {
@@ -71,15 +66,6 @@ const CommandPanel = ({
     onModelSelect?.(slug);
   };
 
-  // Get brand color based on active model's brand
-  const getBrandColorClasses = (brandId: string | undefined) => {
-    if (!brandId) return { bg: "bg-white/80", text: "text-carbon", border: "border-mineral/20" };
-    const colors = brandColors[brandId.toLowerCase()];
-    return colors || { bg: "bg-white/80", text: "text-carbon", border: "border-mineral/20" };
-  };
-
-  const activeBrandColors = getBrandColorClasses(activeModel?.brandId);
-
   return (
     <div className="flex flex-col justify-start h-full space-y-2 lg:space-y-4">
       {/* FIRST: Active Model Info - Priority placement with synchronized transitions */}
@@ -95,7 +81,8 @@ const CommandPanel = ({
           >
             {/* Brand Badge with Dynamic Color - NO DELAY */}
             <motion.div
-              className={`inline-block px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full ${activeBrandColors.bg} ${activeBrandColors.text} backdrop-blur-sm mb-2 shadow-sm`}
+              className="inline-block px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full backdrop-blur-sm mb-2 shadow-sm text-white"
+              style={{ backgroundColor: activeBrandColors.accent }}
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.15, delay: 0 }}
@@ -107,7 +94,8 @@ const CommandPanel = ({
 
             {/* Model Name - NO DELAY for instant sync */}
             <motion.h3 
-              className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-carbon mb-1 lg:mb-3 tracking-tighter leading-none uppercase"
+              className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-1 lg:mb-3 tracking-tighter leading-none uppercase"
+              style={{ color: activeBrandColors.accent }}
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15, delay: 0 }}
@@ -177,7 +165,7 @@ const CommandPanel = ({
             Tous
           </button>
           {brands.map((brand) => {
-            const brandColor = brandColors[brand.id.toLowerCase()];
+            const brandColorConfig = getBrandColors(brand.id);
             const isSelected = selectedBrand === brand.id;
             
             return (
@@ -185,12 +173,11 @@ const CommandPanel = ({
                 key={brand.id}
                 onClick={() => onBrandSelect(brand.id)}
                 className={`flex-shrink-0 px-2.5 py-1.5 md:py-1 rounded-full text-xs font-medium transition-all min-h-[36px] md:min-h-0 ${
-                  isSelected && brandColor
-                    ? `${brandColor.bg} ${brandColor.text}`
-                    : isSelected
-                    ? "bg-primary text-primary-foreground"
+                  isSelected
+                    ? "text-white"
                     : "bg-white/80 backdrop-blur-xl border-[0.5px] border-mineral/20 text-muted-foreground hover:bg-muted/80"
                 }`}
+                style={isSelected ? { backgroundColor: brandColorConfig.accent } : undefined}
               >
                 {brand.name}
               </button>
