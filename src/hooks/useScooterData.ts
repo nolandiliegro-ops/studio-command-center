@@ -38,26 +38,37 @@ export const useBrands = () => {
   });
 };
 
-// Hook pour récupérer les modèles de trottinettes (avec filtrage optionnel par marque)
+// 🔧 CORRECTION DU BUG : Hook pour récupérer les modèles avec AbortController
 export const useScooterModels = (brandSlug?: string | null) => {
   return useQuery({
     queryKey: ["scooter_models", brandSlug],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
+      // ✅ Utiliser le signal d'annulation de React Query
       let query = supabase
         .from("scooter_models")
         .select(`
           *,
           brand:brands(id, name, slug)
         `)
-        .order("name");
+        .order("name")
+        .abortSignal(signal); // ✅ Ajouter le signal d'annulation
 
       if (brandSlug) {
         // Filtrer par slug de marque via la relation
-        const { data: brand } = await supabase
+        const { data: brand, error: brandError } = await supabase
           .from("brands")
           .select("id")
           .eq("slug", brandSlug)
+          .abortSignal(signal) // ✅ Ajouter le signal d'annulation
           .single();
+
+        if (brandError) {
+          // Si la requête est annulée, ne pas throw l'erreur
+          if (brandError.code === 'PGRST301' || signal?.aborted) {
+            return [];
+          }
+          throw brandError;
+        }
 
         if (brand) {
           query = query.eq("brand_id", brand.id);
@@ -65,9 +76,21 @@ export const useScooterModels = (brandSlug?: string | null) => {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
-      return data;
+      
+      if (error) {
+        // Si la requête est annulée, ne pas throw l'erreur
+        if (error.code === 'PGRST301' || signal?.aborted) {
+          return [];
+        }
+        throw error;
+      }
+      
+      return data || [];
     },
+    // ✅ Garder les données précédentes pendant le chargement pour éviter le flash
+    placeholderData: (previousData) => previousData,
+    // ✅ Réduire le stale time pour forcer le refresh
+    staleTime: 0,
   });
 };
 
@@ -147,7 +170,7 @@ export const useSearchScooters = (query: string) => {
 
   return useQuery({
     queryKey: ["search_scooters", debouncedQuery],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (debouncedQuery.length < 2) return [];
 
       const { data, error } = await supabase
@@ -158,9 +181,15 @@ export const useSearchScooters = (query: string) => {
           brand:brands(name)
         `)
         .or(`name.ilike.%${debouncedQuery}%,brands.name.ilike.%${debouncedQuery}%`)
-        .limit(5);
+        .limit(5)
+        .abortSignal(signal); // ✅ Ajouter le signal d'annulation
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === 'PGRST301' || signal?.aborted) {
+          return [];
+        }
+        throw error;
+      }
       
       return (data || []).map((item) => ({
         slug: item.slug,
@@ -172,11 +201,11 @@ export const useSearchScooters = (query: string) => {
   });
 };
 
-// Hook pour récupérer les pièces compatibles avec un modèle de trottinette
+// 🔧 CORRECTION DU BUG : Hook pour récupérer les pièces compatibles avec AbortController
 export const useCompatibleParts = (scooterModelSlug: string | null, limit: number = 4) => {
   return useQuery({
     queryKey: ["compatible_parts", scooterModelSlug, limit],
-    queryFn: async (): Promise<CompatiblePart[]> => {
+    queryFn: async ({ signal }): Promise<CompatiblePart[]> => {
       if (!scooterModelSlug) return [];
 
       // First get the scooter model ID from slug
@@ -184,9 +213,16 @@ export const useCompatibleParts = (scooterModelSlug: string | null, limit: numbe
         .from("scooter_models")
         .select("id")
         .eq("slug", scooterModelSlug)
+        .abortSignal(signal) // ✅ Ajouter le signal d'annulation
         .single();
 
-      if (scooterError || !scooterModel) return [];
+      if (scooterError) {
+        if (scooterError.code === 'PGRST301' || signal?.aborted) {
+          return [];
+        }
+        if (!scooterModel) return [];
+        throw scooterError;
+      }
 
       // Get compatible parts via part_compatibility junction table
       const { data: compatibilityData, error: compatError } = await supabase
@@ -212,9 +248,15 @@ export const useCompatibleParts = (scooterModelSlug: string | null, limit: numbe
           )
         `)
         .eq("scooter_model_id", scooterModel.id)
-        .limit(limit);
+        .limit(limit)
+        .abortSignal(signal); // ✅ Ajouter le signal d'annulation
 
-      if (compatError) throw compatError;
+      if (compatError) {
+        if (compatError.code === 'PGRST301' || signal?.aborted) {
+          return [];
+        }
+        throw compatError;
+      }
 
       // Transform and filter the data - ensure category is properly extracted
       return (compatibilityData || [])
@@ -247,6 +289,8 @@ export const useCompatibleParts = (scooterModelSlug: string | null, limit: numbe
         });
     },
     enabled: !!scooterModelSlug,
+    // ✅ Garder les données précédentes pendant le chargement
+    placeholderData: (previousData) => previousData,
   });
 };
 
@@ -254,13 +298,14 @@ export const useCompatibleParts = (scooterModelSlug: string | null, limit: numbe
 export const useCompatiblePartsCount = (scooterModelSlug: string | null) => {
   return useQuery({
     queryKey: ["compatible_parts_count", scooterModelSlug],
-    queryFn: async (): Promise<number> => {
+    queryFn: async ({ signal }): Promise<number> => {
       if (!scooterModelSlug) return 0;
 
       const { data: scooterModel } = await supabase
         .from("scooter_models")
         .select("id")
         .eq("slug", scooterModelSlug)
+        .abortSignal(signal) // ✅ Ajouter le signal d'annulation
         .single();
 
       if (!scooterModel) return 0;
@@ -268,9 +313,15 @@ export const useCompatiblePartsCount = (scooterModelSlug: string | null) => {
       const { count, error } = await supabase
         .from("part_compatibility")
         .select("*", { count: "exact", head: true })
-        .eq("scooter_model_id", scooterModel.id);
+        .eq("scooter_model_id", scooterModel.id)
+        .abortSignal(signal); // ✅ Ajouter le signal d'annulation
 
-      if (error) return 0;
+      if (error) {
+        if (error.code === 'PGRST301' || signal?.aborted) {
+          return 0;
+        }
+        return 0;
+      }
       return count || 0;
     },
     enabled: !!scooterModelSlug,
