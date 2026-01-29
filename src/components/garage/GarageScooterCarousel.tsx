@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Wrench, ArrowRight, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getScooterImage } from '@/lib/scooterImageMapping';
 import ScooterPlaceholder from './ScooterPlaceholder';
 import CustomPhotoButton from './CustomPhotoButton';
 import VerticalScooterThumbnails from './VerticalScooterThumbnails';
@@ -117,8 +116,8 @@ const GarageScooterCarousel = ({ scooters, onScooterChange, className, mobileCle
   const brandName = safeBrandName((model as any).brand);
   const displayName = currentScooter.nickname || `${brandName} ${model.name}`;
   
-  // Get HD image: DB image_url first, then local mapping
-  const officialImage = getScooterImage(model.slug, model.image_url);
+  // Get HD image from Supabase database
+  const officialImage = model.image_url || '/placeholder.svg';
   const customPhoto = currentScooter.custom_photo_url;
   const displayImage = showCustomPhoto && customPhoto ? customPhoto : officialImage;
   const hasCustomPhoto = !!customPhoto;
@@ -278,7 +277,7 @@ const GarageScooterCarousel = ({ scooters, onScooterChange, className, mobileCle
           {scooters.map((scooter, index) => {
             const isSelected = scooter.id === currentScooter.id;
             const scooterModel = scooter.scooter_model;
-            const image = getScooterImage(scooterModel.slug, scooterModel.image_url);
+            const image = scooterModel.image_url || '/placeholder.svg';
 
             return (
               <button

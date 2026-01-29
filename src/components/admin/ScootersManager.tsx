@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Upload, Zap, Battery, Gauge, Save, Plus, Trash2, Edit, Download, Search, FileText, Link as LinkIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { getScooterImage } from '@/lib/scooterImageMapping';
 
 interface Scooter {
   id: string;
@@ -353,8 +352,7 @@ const ScootersManager = () => {
   };
 
   const getDisplayImage = (scooter: Scooter) => {
-    if (scooter.image_url) return scooter.image_url;
-    return getScooterImage(scooter.slug);
+    return scooter.image_url || '/placeholder.svg';
   };
 
   const filteredScooters = scooters.filter(s => {

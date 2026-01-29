@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Wrench } from "lucide-react";
-import { getScooterImage } from "@/lib/scooterImageMapping";
 
 interface ScooterModel {
   id: string;
@@ -22,7 +21,7 @@ interface ScooterModelCardProps {
 }
 
 const ScooterModelCard = ({ scooter, index = 0 }: ScooterModelCardProps) => {
-  const displayImage = getScooterImage(scooter.slug, scooter.image_url);
+  const displayImage = scooter.image_url || '/placeholder.svg';
 
   return (
     <motion.div

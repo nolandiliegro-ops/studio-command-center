@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { getScooterImage } from '@/lib/scooterImageMapping';
 import { cn } from '@/lib/utils';
 
 interface GarageScooter {
@@ -40,7 +39,7 @@ const VerticalScooterThumbnails = ({
       {scooters.map((scooter, index) => {
         const isSelected = scooter.id === selectedScooterId;
         const model = scooter.scooter_model;
-        const image = getScooterImage(model.slug, model.image_url);
+        const image = model.image_url || '/placeholder.svg';
 
         return (
           <motion.button

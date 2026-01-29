@@ -1,14 +1,13 @@
 import { motion } from "framer-motion";
 import { ScooterDetail } from "@/hooks/useScooterDetail";
-import { getScooterImage } from "@/lib/scooterImageMapping";
 
 interface ScooterHeroProps {
   scooter: ScooterDetail;
 }
 
 const ScooterHero = ({ scooter }: ScooterHeroProps) => {
-  // Priority: local HD assets > database URL > null
-  const displayImage = getScooterImage(scooter.slug, scooter.image_url);
+  // Use image from Supabase database
+  const displayImage = scooter.image_url || '/placeholder.svg';
 
   return (
     <section 
