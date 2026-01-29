@@ -457,30 +457,27 @@ const ScooterCarousel = ({
         </div>
       </motion.div>
 
-      {/* BRIDGE BUTTON - Relative on mobile, absolute on desktop */}
+      {/* BRIDGE BUTTON - Pill Style moderne */}
       <motion.div 
-        className="relative lg:absolute mt-3 lg:mt-0 lg:bottom-[14%] lg:left-1/2 lg:-translate-x-1/2 z-40 order-5 lg:order-none flex justify-center"
+        className="relative lg:absolute mt-2 lg:mt-0 lg:bottom-[16%] lg:left-1/2 lg:-translate-x-1/2 z-40 order-5 lg:order-none flex justify-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        whileHover={{ scale: 1.05, rotate: 2 }}
+        whileTap={{ scale: 0.98 }}
         transition={{ delay: 0.4, ...premiumTransition }}
       >
         <button
           onClick={() => document.getElementById('compatible-parts')?.scrollIntoView({ behavior: 'smooth' })}
-          className="group relative flex items-center gap-2 lg:gap-4 
-                     px-5 py-3 lg:px-10 lg:py-5 
-                     bg-carbon text-greige 
-                     font-display text-sm lg:text-xl tracking-wide
-                     rounded-full border border-white/10
-                     shadow-[0_8px_32px_rgba(28,28,28,0.4)]
-                     hover:shadow-[0_12px_48px_rgba(28,28,28,0.6)]
-                     hover:scale-105 active:scale-100
+          className="group relative flex items-center gap-2 lg:gap-3 
+                     px-5 py-3 lg:px-8 lg:py-4 
+                     bg-transparent text-carbon 
+                     font-bold text-xs lg:text-sm tracking-wide uppercase
+                     rounded-full border-2 border-carbon
+                     hover:bg-carbon hover:text-white
                      transition-all duration-300"
         >
-          {/* Glow Effect */}
-          <span className="absolute inset-0 rounded-full bg-gradient-to-r from-mineral/20 to-garage/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity" />
-          
-          <span className="relative z-10">DÉCOUVRIR LES {activeModel?.compatibleParts || 0} PIÈCES</span>
-          <ChevronDown className="relative z-10 w-4 h-4 lg:w-6 lg:h-6 animate-bounce" />
+          <span>DÉCOUVRIR LES {activeModel?.compatibleParts || 0} PIÈCES</span>
+          <ChevronDown className="w-4 h-4 lg:w-5 lg:h-5 animate-bounce" />
         </button>
       </motion.div>
 
