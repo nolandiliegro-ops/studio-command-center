@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,11 +24,71 @@ interface ScooterInput {
   youtube_video_id?: string;
   affiliate_link?: string;
   technical_signature?: Record<string, unknown>;
-  // Clés de montage frein (contrat d'import — étape 2). Entiers nus, mêmes
-  // unités que scooter_models.disc_*_code : Ø mm / entraxe mm / nb trous.
-  disc_diameter?: number;
-  disc_pcd?: number;
-  disc_holes?: number;
+  // Clés de montage (contrat d'import — étapes 2 et 4). Codes des référentiels
+  // fitment_* : entier nu (160) ou string verbatim ("160", "6.5", "134mm").
+  // Écrits en String(v).trim(), validés par fitmentCodeFields ci-dessous.
+  disc_diameter?: number | string;
+  disc_pcd?: number | string;
+  disc_holes?: number | string;
+  rim_diameter?: string;
+  tire_section?: string;
+  caliper_family?: string;
+  tire_family?: string; // "pneumatic" | "solid" — text libre en base, ensemble en dur
+}
+
+// ─── Clés de montage : garde-preserve + validation référentiel ─────────────────
+// Même mécanisme que seoRowFields (bulk-insert-parts, 5a646c2) : seule une valeur
+// réellement fournie entre dans la row. Clé absente, null ou vide → la colonne
+// n'est JAMAIS posée (l'UPDATE la laisse intacte, l'INSERT prend le DEFAULT).
+// En plus : code hors référentiel → colonne sautée + warning nominatif, jamais de
+// rejet du modèle entier (la FK en base rejetterait TOUTES les colonnes d'un coup).
+export const FITMENT_KEYS = [
+  ["rim_diameter", "rim_diameter_code", "fitment_rim_diameters"],
+  ["tire_section", "tire_section_code", "fitment_tire_sections"],
+  ["disc_diameter", "disc_diameter_code", "fitment_disc_diameters"],
+  ["disc_pcd", "disc_pcd_code", "fitment_disc_pcd"],
+  ["disc_holes", "disc_holes_code", "fitment_disc_holes"],
+  ["caliper_family", "caliper_family", "fitment_caliper_families"],
+  ["tire_family", "tire_family", "tire_family"],
+] as const;
+
+type FitmentKey = (typeof FITMENT_KEYS)[number][0];
+
+// tire_family : aucune table fitment_tire_families, aucun FK, aucun CHECK (audit 09/09).
+export const TIRE_FAMILIES: ReadonlySet<string> = new Set(["pneumatic", "solid"]);
+
+export type FitmentVocab = Record<string, ReadonlySet<string>>;
+export interface FitmentWarning { name: string; field: string; code: string }
+
+export function fitmentCodeFields(
+  scooter: { name?: string; slug?: string } & Partial<Record<FitmentKey, unknown>>,
+  vocab: FitmentVocab,
+  warnings: FitmentWarning[],
+): Record<string, string> {
+  const out: Record<string, string> = {};
+  const name = scooter.name ?? scooter.slug ?? "unknown";
+  for (const [key, column, ref] of FITMENT_KEYS) {
+    const v = scooter[key];
+    const provided = Number.isInteger(v) || (typeof v === "string" && v.trim() !== "");
+    if (!provided) continue;
+    const code = String(v).trim();
+    if (vocab[ref]?.has(code)) out[column] = code;
+    else warnings.push({ name, field: column, code });
+  }
+  return out;
+}
+
+// Charge les 6 référentiels fitment_* en Set<string>, une fois par requête.
+// Lève si une lecture échoue → 500 par le catch global : jamais d'écriture sans référentiel.
+export async function loadFitmentVocab(supabase: SupabaseClient): Promise<FitmentVocab> {
+  const vocab: FitmentVocab = { tire_family: TIRE_FAMILIES };
+  for (const [, , ref] of FITMENT_KEYS) {
+    if (ref === "tire_family") continue;
+    const { data, error } = await supabase.from(ref).select("code");
+    if (error) throw new Error(`Référentiel ${ref} illisible : ${error.message}`);
+    vocab[ref] = new Set((data ?? []).map((r: { code: string }) => r.code));
+  }
+  return vocab;
 }
 
 interface BrandInput {
@@ -54,7 +115,7 @@ interface RequestBody {
   scooters: ScooterInput[];
 }
 
-Deno.serve(async (req) => {
+const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -87,6 +148,9 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // 0. Référentiels fitment_* — AVANT toute écriture (brand comprise).
+    const vocab = await loadFitmentVocab(supabase);
 
     // 1. Upsert brand
     // NFD + strip diacritiques : même algo que le slugify canonique (scripts/lib/slugify.js).
@@ -139,6 +203,8 @@ Deno.serve(async (req) => {
       inserted: 0,
       updated: 0,
       errors: [] as { name: string; error: string }[],
+      // Codes de montage hors référentiel : colonne sautée, modèle quand même traité.
+      warnings: [] as FitmentWarning[],
       rows: [] as { name: string; slug: string; id: string | null; status: "inserted" | "updated" | "skipped" | "error" }[],
     };
 
@@ -154,14 +220,10 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Clés de montage frein — guard-preserve (même motif que electrical_specs
-      // dans bulk-insert-parts) : clé absente ou non entière → colonne
-      // disc_*_code JAMAIS touchée (pas d'écrasement par NULL).
-      const discPatch = {
-        ...(Number.isInteger(scooter.disc_diameter) ? { disc_diameter_code: scooter.disc_diameter } : {}),
-        ...(Number.isInteger(scooter.disc_pcd) ? { disc_pcd_code: scooter.disc_pcd } : {}),
-        ...(Number.isInteger(scooter.disc_holes) ? { disc_holes_code: scooter.disc_holes } : {}),
-      };
+      // 7 clés de montage — guard-preserve + validation référentiel (voir
+      // fitmentCodeFields) : clé absente / vide / hors référentiel → colonne
+      // JAMAIS touchée (pas d'écrasement par NULL, pas de code inconnu).
+      const fitmentPatch = fitmentCodeFields(scooter, vocab, results.warnings);
 
       // Lookup AVANT écriture : détermine inserted vs updated ET le chemin.
       const { data: existing } = await supabase
@@ -194,7 +256,7 @@ Deno.serve(async (req) => {
           ...(scooter.youtube_video_id !== undefined ? { youtube_video_id: scooter.youtube_video_id } : {}),
           ...(scooter.affiliate_link !== undefined ? { affiliate_link: scooter.affiliate_link } : {}),
           ...(scooter.technical_signature !== undefined ? { technical_signature: scooter.technical_signature } : {}),
-          ...discPatch,
+          ...fitmentPatch,
         };
 
         const displayName = scooter.name ?? (existing.name as string) ?? scooter.slug;
@@ -246,7 +308,7 @@ Deno.serve(async (req) => {
           affiliate_link: scooter.affiliate_link || null,
           technical_signature: scooter.technical_signature || {},
           published: false, // Bot imports always start as drafts
-          ...discPatch,
+          ...fitmentPatch,
         };
 
         const { data: insertedRow, error: insertError } = await supabase
@@ -279,4 +341,9 @@ Deno.serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
-});
+};
+
+// import.meta.main est false sous `deno test` → pas de Deno.serve, le module reste importable.
+if (import.meta.main) {
+  Deno.serve(handler);
+}

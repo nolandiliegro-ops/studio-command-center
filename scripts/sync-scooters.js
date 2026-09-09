@@ -14,6 +14,13 @@
  * Sans elles, le run S'ARRÊTE avant tout appel réseau (insert comme --update).
  * --allow-missing-keys transforme le refus en warning par scooter (cas assumés :
  * frein tambour, specs introuvables).
+ *
+ * Clés de montage OPTIONNELLES (étape 4), codes des référentiels fitment_* en string
+ * verbatim (→ scooter_models.*) :
+ *   rim_diameter ("6.5", "134mm" → rim_diameter_code) · tire_section ("90/65" → tire_section_code)
+ *   caliper_family ("nutt_4p" → caliper_family) · tire_family ("pneumatic" | "solid" → tire_family)
+ * Garde anti-écrasement côté Edge Function : clé absente ou vide = colonne intacte en base ;
+ * code hors référentiel = colonne sautée + warning nominatif (le modèle est quand même traité).
  */
 
 import { readFileSync } from 'fs';
@@ -211,6 +218,15 @@ async function main() {
     if (Array.isArray(errors) && errors.length > 0) {
       console.log('   Erreurs :');
       for (const e of errors) console.log(`   ✗ ${e.name ?? e} — ${e.error ?? ''}`);
+    }
+
+    // Codes de montage hors référentiel : la colonne n'a PAS été écrite, le reste du modèle oui.
+    const warnings = result.results?.warnings ?? [];
+    if (Array.isArray(warnings) && warnings.length > 0) {
+      console.log('   Avertissements clés de montage :');
+      for (const w of warnings) {
+        console.log(`   ⚠  ${w.name} — ${w.field}="${w.code}" absent du référentiel, colonne non écrite`);
+      }
     }
 
     // ── Détourage images (si results.rows disponible) ─────────────────────────
