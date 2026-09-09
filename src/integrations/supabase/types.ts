@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      _backup_alias_20260905: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          note: string | null
+          raw_model: string | null
+          scooter_model_slug: string | null
+          source: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          note?: string | null
+          raw_model?: string | null
+          scooter_model_slug?: string | null
+          source?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          note?: string | null
+          raw_model?: string | null
+          scooter_model_slug?: string | null
+          source?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       _backup_caliper_20260718: {
         Row: {
           caliper_family: string | null
@@ -55,6 +88,33 @@ export type Database = {
           id?: string | null
           image_url?: string | null
           name?: string | null
+          slug?: string | null
+        }
+        Relationships: []
+      }
+      _backup_kukirin_20260908: {
+        Row: {
+          disc_diameter_code: string | null
+          disc_holes_code: string | null
+          disc_pcd_code: string | null
+          id: string | null
+          image_url: string | null
+          slug: string | null
+        }
+        Insert: {
+          disc_diameter_code?: string | null
+          disc_holes_code?: string | null
+          disc_pcd_code?: string | null
+          id?: string | null
+          image_url?: string | null
+          slug?: string | null
+        }
+        Update: {
+          disc_diameter_code?: string | null
+          disc_holes_code?: string | null
+          disc_pcd_code?: string | null
+          id?: string | null
+          image_url?: string | null
           slug?: string | null
         }
         Relationships: []
@@ -146,6 +206,33 @@ export type Database = {
           part_id?: string | null
           scooter_model_id?: string | null
           suggestion_reason?: string | null
+        }
+        Relationships: []
+      }
+      _backup_scootkeys_20260908: {
+        Row: {
+          disc_diameter_code: string | null
+          disc_holes_code: string | null
+          disc_pcd_code: string | null
+          id: string | null
+          image_url: string | null
+          slug: string | null
+        }
+        Insert: {
+          disc_diameter_code?: string | null
+          disc_holes_code?: string | null
+          disc_pcd_code?: string | null
+          id?: string | null
+          image_url?: string | null
+          slug?: string | null
+        }
+        Update: {
+          disc_diameter_code?: string | null
+          disc_holes_code?: string | null
+          disc_pcd_code?: string | null
+          id?: string | null
+          image_url?: string | null
+          slug?: string | null
         }
         Relationships: []
       }
@@ -770,6 +857,7 @@ export type Database = {
       }
       fitment_raw: {
         Row: {
+          alias_key: string | null
           category: string
           claim_type: string
           dedup_key: string
@@ -787,6 +875,7 @@ export type Database = {
           supplier_sku: string | null
         }
         Insert: {
+          alias_key?: string | null
           category: string
           claim_type?: string
           dedup_key: string
@@ -804,6 +893,7 @@ export type Database = {
           supplier_sku?: string | null
         }
         Update: {
+          alias_key?: string | null
           category?: string
           claim_type?: string
           dedup_key?: string
@@ -1576,6 +1666,8 @@ export type Database = {
           scooter_model_id: string
           updated_at: string
           voltage: number
+          year_from: number | null
+          year_to: number | null
         }
         Insert: {
           amperage: number
@@ -1589,6 +1681,8 @@ export type Database = {
           scooter_model_id: string
           updated_at?: string
           voltage: number
+          year_from?: number | null
+          year_to?: number | null
         }
         Update: {
           amperage?: number
@@ -1602,6 +1696,8 @@ export type Database = {
           scooter_model_id?: string
           updated_at?: string
           voltage?: number
+          year_from?: number | null
+          year_to?: number | null
         }
         Relationships: [
           {
@@ -1898,6 +1994,7 @@ export type Database = {
       }
       supplier_model_alias: {
         Row: {
+          alias_key: string | null
           created_at: string
           id: string
           note: string | null
@@ -1908,6 +2005,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          alias_key?: string | null
           created_at?: string
           id?: string
           note?: string | null
@@ -1918,6 +2016,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          alias_key?: string | null
           created_at?: string
           id?: string
           note?: string | null
@@ -1927,7 +2026,15 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "smalias_slug_fkey"
+            columns: ["scooter_model_slug"]
+            isOneToOne: false
+            referencedRelation: "scooter_models"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       tutorials: {
         Row: {
@@ -2151,6 +2258,36 @@ export type Database = {
       }
     }
     Views: {
+      v_fitment_claims: {
+        Row: {
+          alias_key: string | null
+          category: string | null
+          claim_type: string | null
+          dedup_key: string | null
+          ean13: string | null
+          geom: Json | null
+          geom_signature: string | null
+          id: string | null
+          model_slug: string | null
+          raw_model: string | null
+          raw_payload: Json | null
+          raw_title: string | null
+          resolved_slug: string | null
+          scraped_at: string | null
+          source: string | null
+          source_url: string | null
+          supplier_sku: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smalias_slug_fkey"
+            columns: ["resolved_slug"]
+            isOneToOne: false
+            referencedRelation: "scooter_models"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       v_fitment_corroboration: {
         Row: {
           geom_signature: string | null
@@ -2159,6 +2296,21 @@ export type Database = {
           sources: string[] | null
         }
         Relationships: []
+      }
+      v_model_alias_resolved: {
+        Row: {
+          alias_key: string | null
+          scooter_model_slug: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smalias_slug_fkey"
+            columns: ["scooter_model_slug"]
+            isOneToOne: false
+            referencedRelation: "scooter_models"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
     }
     Functions: {
@@ -2204,6 +2356,7 @@ export type Database = {
         }
         Returns: string
       }
+      pt_model_key: { Args: { t: string }; Returns: string }
       search_parts_fuzzy: {
         Args: {
           p_category_ids?: string[]
